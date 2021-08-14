@@ -5,7 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -16,14 +15,13 @@ public class Game
 {
     private final List<UUID> players;
     private final GameTimer game;
-    private boolean start;
-
     private final List<Phase> phases;
+    private boolean start;
     private int currentPhase;
 
     //=========ここからゲーム用変数
-    private boolean isInPhase;
-    private List<UUID> finishedPlayers;
+    private final boolean isInPhase;
+    private final List<UUID> finishedPlayers;
 
     public Game()
     {
@@ -51,6 +49,7 @@ public class Game
         new BukkitRunnable()
         {
             private int time = 0;
+
             @Override
             public void run()
             {
@@ -63,18 +62,103 @@ public class Game
 
                 broadcastMessage(ChatColor.YELLOW + "スタートまで " +
                         ChatColor.RED + time + " 秒!");
-                broadcastTitle(ChatColor.RED + String.valueOf(time),
-                        ChatColor.GREEN + "まもなくゲームがスタートします！");
+                broadcastTitle(
+                        ChatColor.RED + String.valueOf(time),
+                        ChatColor.GREEN + "まもなくゲームがスタートします！"
+                );
             }
         }.runTaskTimer(RememberRecipeQuiz.getPlugin(), 0L, 20L);
     }
-
 
     public void actuallyStop()
     {
         broadcastPlayer(ChatColor.RED + "ゲームが終了しました！");
         this.game.cancel();
         this.start = false;
+    }
+
+    public List<UUID> getPlayers()
+    {
+        return players;
+    }
+
+    public void addPlayer(Player player)
+    {
+        this.players.add(player.getUniqueId());
+        player.sendMessage(ChatColor.GREEN + "レシピクイズに参加しました！\n開始をお待ち下さい。");
+    }
+
+    //===================================ここから下ゲッター・セッター
+
+    public void removePlayer(Player player)
+    {
+        this.players.remove(player.getUniqueId());
+        this.finishedPlayers.remove(player.getUniqueId());
+        player.sendMessage(ChatColor.RED + "レシピクイズから退出しました。");
+
+    }
+
+    public void addPhase(Phase phase)
+    {
+        broadcastMessage(ChatColor.GREEN + "問題が追加されました！");
+        this.phases.add(phase);
+    }
+
+    private void broadcastMessage(String message)
+    {
+        Bukkit.broadcast(Component.text(message));
+    }
+
+    private void broadcastABMessage(String message)
+    {
+        Bukkit.getOnlinePlayers().stream().parallel()
+                .forEach(player -> player.sendActionBar(Component.text(message)));
+    }
+
+    private void broadcastTitle(String title, String subtitle)
+    {
+        Bukkit.getOnlinePlayers().stream().parallel().forEach(player -> {
+            player.sendTitle(title, subtitle, 5, 10, 5);
+        });
+    }
+
+    private void broadcastTitle(String title, String subtitle, int i, int s, int o)
+    {
+        Bukkit.getOnlinePlayers().stream().parallel().forEach(player -> {
+            player.sendTitle(title, subtitle, i, s, o);
+        });
+    }
+
+    private void broadcastPlayer(String message)
+    {
+        this.players.stream().parallel()
+                .forEach(uuid -> {
+                    Player player = Bukkit.getPlayer(uuid);
+                    if (player != null)
+                        player.sendMessage(message);
+                });
+    }
+
+    public static class Phase
+    {
+        private final int timeWait;
+        private final Material targetMaterial;
+
+        public Phase(int timeWait, Material targetMaterial)
+        {
+            this.timeWait = timeWait;
+            this.targetMaterial = targetMaterial;
+        }
+
+        public int getTimeWait()
+        {
+            return timeWait;
+        }
+
+        public Material getTargetMaterial()
+        {
+            return targetMaterial;
+        }
     }
 
     private class GameTimer extends BukkitRunnable
@@ -123,12 +207,14 @@ public class Game
         {
             int ps = players.size();
             int fps = finishedPlayers.size();
-            broadcastTitle(ChatColor.RED + "終了！",
+            broadcastTitle(
+                    ChatColor.RED + "終了！",
                     Utils.getCP(fps, ps) + ChatColor.GREEN + " 人がクリアしました！(" +
-                            ((int)(((double) fps / (double) ps) * 100)) + "%)");
+                            ((int) (((double) fps / (double) ps) * 100)) + "%)"
+            );
 
             int count = 0;
-            for (UUID uuid: players)
+            for (UUID uuid : players)
             {
                 if (finishedPlayers.contains(uuid))
                     continue;
@@ -171,11 +257,12 @@ public class Game
                         player.sendTitle(ChatColor.GREEN + "お題：" + this.itemName,
                                 ChatColor.YELLOW + "残り " + Utils.getCP(interval, phaseStaging.timeWait) +
                                         ChatColor.YELLOW + " 秒",
-                                0, 22, 0);
+                                0, 22, 0
+                        );
                         int ps = players.size();
                         int fps = finishedPlayers.size();
                         player.sendActionBar(Component.text(ChatColor.GREEN.toString() + ps + " 人中 " + Utils.getCP(fps, ps) +
-                                ChatColor.GREEN + " 人がクリアしました！(" + ((int)(((double) fps / (double) ps) * 100)) + "%)"));
+                                ChatColor.GREEN + " 人がクリアしました！(" + ((int) (((double) fps / (double) ps) * 100)) + "%)"));
                     });
         }
 
@@ -186,90 +273,6 @@ public class Game
             this.itemName = Utils.getItemName(phaseStaging.targetMaterial);
             broadcastMessage(ChatColor.YELLOW + "お題：" + ChatColor.RED + itemName);
         }
-    }
-
-    public static class Phase
-    {
-        private final int timeWait;
-        private final Material targetMaterial;
-
-        public Phase(int timeWait, Material targetMaterial)
-        {
-            this.timeWait = timeWait;
-            this.targetMaterial = targetMaterial;;
-        }
-
-        public int getTimeWait()
-        {
-            return timeWait;
-        }
-
-        public Material getTargetMaterial()
-        {
-            return targetMaterial;
-        }
-    }
-
-    //===================================ここから下ゲッター・セッター
-
-    public List<UUID> getPlayers()
-    {
-        return players;
-    }
-
-    public void addPlayer(Player player)
-    {
-        this.players.add(player.getUniqueId());
-        player.sendMessage(ChatColor.GREEN + "レシピクイズに参加しました！\n開始をお待ち下さい。");
-    }
-
-    public void removePlayer(Player player)
-    {
-        this.players.remove(player.getUniqueId());
-        this.finishedPlayers.remove(player.getUniqueId());
-        player.sendMessage(ChatColor.RED + "レシピクイズから退出しました。");
-
-    }
-
-    public void addPhase(Phase phase)
-    {
-        broadcastMessage(ChatColor.GREEN + "問題が追加されました！");
-        this.phases.add(phase);
-    }
-
-    private void broadcastMessage(String message)
-    {
-        Bukkit.broadcast(Component.text(message));
-    }
-    private void broadcastABMessage(String message)
-    {
-        Bukkit.getOnlinePlayers().stream().parallel()
-                .forEach(player -> player.sendActionBar(Component.text(message)));
-    }
-
-    private void broadcastTitle(String title, String subtitle)
-    {
-        Bukkit.getOnlinePlayers().stream().parallel().forEach(player -> {
-            player.sendTitle(title, subtitle, 5, 10, 5);
-        });
-    }
-
-
-    private void broadcastTitle(String title, String subtitle, int i, int s, int o)
-    {
-        Bukkit.getOnlinePlayers().stream().parallel().forEach(player -> {
-            player.sendTitle(title, subtitle, i, s, o);
-        });
-    }
-
-    private void broadcastPlayer(String message)
-    {
-        this.players.stream().parallel()
-                .forEach(uuid -> {
-                    Player player = Bukkit.getPlayer(uuid);
-                    if (player != null)
-                        player.sendMessage(message);
-                });
     }
 
 }

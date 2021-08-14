@@ -1,0 +1,8 @@
+name: RememberRecipeQuiz
+version: ${project.version}
+main: net.kunmc.lab.rememberrecipequiz.RememberRecipeQuiz
+api-version: 1.16
+prefix: RememberRecipe
+authors: [Peyang]
+description: クラフトレシピ覚えてないとだめ。
+website: https://kunmc.net/

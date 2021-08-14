@@ -6,3 +6,23 @@ prefix: RememberRecipe
 authors: [Peyang]
 description: クラフトレシピ覚えてないとだめ。
 website: https://kunmc.net/
+
+commands:
+  rememberrecipequiz:
+    aliases: ["rrq", "recipequiz", "req"]
+    description: メインコマンド。
+
+permissions:
+  req:
+    description: メイン権限。
+    default: op
+    children:
+      req.admin: true
+  req.admin:
+    description: 管理権限。
+    default: op
+    children:
+      req.play: true
+  req.play:
+    description: 参加権限。
+    default: true

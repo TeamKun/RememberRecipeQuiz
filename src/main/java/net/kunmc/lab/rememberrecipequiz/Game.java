@@ -72,6 +72,7 @@ public class Game
     {
         broadcastMessage(ChatColor.GREEN + "ゲームがスタートしました！");
         broadcastTitle(ChatColor.GREEN + "スタート！", "");
+        this.indicator.setVisible(true);
         this.start = true;
         this.game.runTaskTimer(RememberRecipeQuiz.getPlugin(), 0L, 20L);
     }

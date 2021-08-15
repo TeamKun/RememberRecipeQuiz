@@ -214,6 +214,10 @@ public class Game
         {
             if (!start)
                 return;
+
+            if (flags.contains(Flag.NO_EXAMPLE))
+                return;
+
             if (e.getSlot() != 8)
                 return;
             e.setCancelled(true);
@@ -357,7 +361,8 @@ public class Game
     public enum Flag
     {
         ONLY_ONCE_SUBMIT("once_craft"),
-        REVIVE_IN_NEXT_PHASE("revive_next_phase");
+        REVIVE_IN_NEXT_PHASE("revive_next_phase"),
+        NO_EXAMPLE("no_example");
         //ENDLESS("endless");
 
         private final String id;
@@ -548,7 +553,9 @@ public class Game
                             return;
                         Bukkit.broadcast(Component.text(ChatColor.YELLOW + "お題：" + ChatColor.RED + itemName),
                                 "req.play");
-                        player.getInventory().setItem(8, example);
+
+                        if (!flags.contains(Flag.NO_EXAMPLE))
+                            player.getInventory().setItem(8, example);
                     });
 
             indicator.setProgress((currentPhase + 1) / (double) phases.size());

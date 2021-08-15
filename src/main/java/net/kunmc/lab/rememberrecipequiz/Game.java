@@ -421,6 +421,7 @@ public class Game
             broadcastMessage(ChatColor.YELLOW + "お題：" + ChatColor.RED + itemName);
 
             indicator.setProgress((currentPhase + 1) / (double) phases.size());
+            indicator.setTitle(ChatColor.GREEN.toString() + (currentPhase + 1) + " 問目          -          " + phases.size() + " 問中");
         }
     }
 }

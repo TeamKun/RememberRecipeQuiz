@@ -127,6 +127,7 @@ public class Game
     {
         this.players.remove(player.getUniqueId());
         this.finishedPlayers.remove(player.getUniqueId());
+        this.eliminatedPlayers.remove(player.getUniqueId());
         this.indicator.removePlayer(player);
         player.sendMessage(ChatColor.RED + "レシピクイズから退出しました。");
 

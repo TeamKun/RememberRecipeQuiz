@@ -42,7 +42,7 @@ public class Game
     //=========ここからゲーム用変数
     private final BossBar indicator;
     private final List<UUID> finishedPlayers;
-    private final List<UUID> eliminatedPlayers;
+    private List<UUID> eliminatedPlayers;
     private Phase phaseStaging;
     private final List<Flag> flags;
 

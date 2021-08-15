@@ -53,7 +53,7 @@ public class CommandMain implements CommandExecutor, TabCompleter
     {
         ArrayList<String> completes = new ArrayList<>();
 
-        if (!sender.hasPermission("kpm.use"))
+        if (!sender.hasPermission("req.use"))
             return new ArrayList<>();
 
         switch (args.length)

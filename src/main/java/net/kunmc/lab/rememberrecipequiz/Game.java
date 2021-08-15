@@ -161,6 +161,11 @@ public class Game
 
     }
 
+    public List<Phase> getPhases()
+    {
+        return phases;
+    }
+
     public void addPhase(Phase phase)
     {
         broadcastMessage(ChatColor.GREEN + "お題が追加されました！");

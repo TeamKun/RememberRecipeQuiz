@@ -51,6 +51,9 @@ public class CommandMain implements CommandExecutor, TabCompleter
             case "random":
                 CommandRandom.run(sender, oxb);
                 break;
+            case "start":
+                CommandStart.run(sender, oxb);
+                break;
             default:
                 sender.sendMessage(ChatColor.RED + "E: 不明なコマンドです！");
                 sender.sendMessage(ChatColor.AQUA + "/req help コマンドでヘルプを閲覧することが出来ます。");
@@ -71,7 +74,7 @@ public class CommandMain implements CommandExecutor, TabCompleter
         switch (args.length)
         {
             case 1:
-                completes.addAll(Arrays.asList("help", "add", "flag", "random"));
+                completes.addAll(Arrays.asList("help", "add", "flag", "random", "start"));
                 break;
             case 2:
                 switch (args[0])
@@ -80,6 +83,7 @@ public class CommandMain implements CommandExecutor, TabCompleter
                         completes.addAll(Arrays.asList(Game.Flag.names()));
                         break;
                 }
+                break;
             case 3:
                 switch (args[0])
                 {

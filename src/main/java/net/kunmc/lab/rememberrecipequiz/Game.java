@@ -63,6 +63,11 @@ public class Game
         this.protocol.addPacketListener(new CraftPacketListener());
     }
 
+    public boolean isStarted()
+    {
+        return start;
+    }
+
     public void actuallyStart()
     {
         broadcastMessage(ChatColor.GREEN + "ゲームがスタートしました！");

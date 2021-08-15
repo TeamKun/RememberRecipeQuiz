@@ -138,7 +138,12 @@ public class Utils
 
         Random random = new Random();
 
-        return recipes.get(random.nextInt(recipes.size()));
+        Recipe recipe = recipes.get(random.nextInt(recipes.size()));
+
+        if (recipe.getResult().getType() == Material.AIR)
+            return getRandomRecipe();
+
+        return recipe;
 
     }
 }

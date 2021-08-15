@@ -17,12 +17,12 @@ public final class RememberRecipeQuiz extends JavaPlugin
     public void onEnable()
     {
         plugin = this;
-        Bukkit.getOnlinePlayers().stream().parallel()
-                .filter(player -> player.hasPermission("req.play"))
-                .forEach(game::addPlayer);
 
         game = new Game();
         game.registerLogics();
+        Bukkit.getOnlinePlayers().stream().parallel()
+                .filter(player -> player.hasPermission("req.play"))
+                .forEach(game::addPlayer);
     }
 
     @Override

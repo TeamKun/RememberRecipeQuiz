@@ -1,5 +1,6 @@
 package net.kunmc.lab.rememberrecipequiz;
 
+import net.kunmc.lab.rememberrecipequiz.commands.CommandMain;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -23,6 +24,10 @@ public final class RememberRecipeQuiz extends JavaPlugin
         Bukkit.getOnlinePlayers().stream().parallel()
                 .filter(player -> player.hasPermission("req.play"))
                 .forEach(game::addPlayer);
+
+        getCommand("req").setExecutor(new CommandMain());
+        getCommand("req").setTabCompleter(new CommandMain());
+
     }
 
     @Override

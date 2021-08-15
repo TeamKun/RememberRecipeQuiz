@@ -13,6 +13,7 @@ import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Furnace;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -20,6 +21,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.FurnaceBurnEvent;
+import org.bukkit.event.inventory.FurnaceExtractEvent;
+import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -241,8 +245,45 @@ public class Game
         @EventHandler
         public void onCraftComplete(CraftItemEvent e)
         {
-            Player player = (Player) e.getWhoClicked();
-            if(e.getRecipe().getResult().getType() != phaseStaging.getTargetMaterial())
+            onComplete((Player) e.getWhoClicked(), e.getRecipe().getResult().getType());
+        }
+
+        @EventHandler
+        public void onFurnaceBurn(FurnaceBurnEvent e)
+        {
+            Furnace furnace = (Furnace) e.getBlock().getState();
+            if (furnace.getCookTime() < 2)
+            {
+                furnace.setCookTime((short) 9);
+                furnace.setCookTimeTotal((short) 10);
+            }
+            furnace.update(true);
+        }
+
+        @EventHandler
+        public void onFurnaceSmelt(FurnaceSmeltEvent e) {
+
+            Furnace furnace = (Furnace) e.getBlock().getState();
+            if (furnace.getCookTime() < 2)
+            {
+                furnace.setCookTime((short) 9);
+                furnace.setCookTimeTotal((short) 10);
+            }
+            furnace.update(true);
+        }
+
+        @EventHandler
+        public void onFurnaceExtract(FurnaceExtractEvent e)
+        {
+            onComplete(e.getPlayer(), e.getItemType());
+        }
+
+        private void onComplete(Player player, Material type)
+        {
+            if (phaseStaging == null)
+                return;
+
+            if(type != phaseStaging.getTargetMaterial())
                 if (flags.contains(Flag.ONLY_ONCE_SUBMIT))
                 {
                     player.setHealth(0.0);

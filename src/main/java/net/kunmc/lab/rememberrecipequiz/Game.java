@@ -80,12 +80,12 @@ public class Game
     {
         new BukkitRunnable()
         {
-            private int time = 0;
+            private int time = 5;
 
             @Override
             public void run()
             {
-                if (++time > 5)
+                if (--time <= 0)
                 {
                     this.cancel();
                     actuallyStart();

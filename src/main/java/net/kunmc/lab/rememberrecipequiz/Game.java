@@ -100,7 +100,7 @@ public class Game
 
     public void addPhase(Phase phase)
     {
-        broadcastMessage(ChatColor.GREEN + "問題が追加されました！");
+        broadcastMessage(ChatColor.GREEN + "お題が追加されました！");
         this.phases.add(phase);
     }
 

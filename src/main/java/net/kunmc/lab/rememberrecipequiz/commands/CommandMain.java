@@ -35,10 +35,21 @@ public class CommandMain implements CommandExecutor, TabCompleter
 
         argsList.remove(0);
 
+        String[] oxb = argsList.toArray(new String[0]);
+
         switch (args[0].toLowerCase())
         {
             case "help":
-                CommandHelp.run(sender, argsList.toArray(new String[0]));
+                CommandHelp.run(sender, oxb);
+                break;
+            case "add":
+                CommandAdd.run(sender, oxb);
+                break;
+            case "flag":
+                CommandFlag.run(sender, oxb);
+                break;
+            case "random":
+                CommandRandom.run(sender, oxb);
                 break;
             default:
                 sender.sendMessage(ChatColor.RED + "E: 不明なコマンドです！");

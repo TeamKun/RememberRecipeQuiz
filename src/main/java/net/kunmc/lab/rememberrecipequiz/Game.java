@@ -210,6 +210,10 @@ public class Game
         {
             if (e.getPacketType() != PacketType.Play.Server.AUTO_RECIPE)
                 return;
+
+            if (!start)
+                return;
+
             UUID id = e.getPlayer().getUniqueId();
             if (players.contains(id) && !finishedPlayers.contains(id))
             {
@@ -424,7 +428,7 @@ public class Game
             broadcastMessage(ChatColor.YELLOW + "お題：" + ChatColor.RED + itemName);
 
             indicator.setProgress((currentPhase + 1) / (double) phases.size());
-            indicator.setTitle(ChatColor.GREEN.toString() + (currentPhase + 1) + " 問目          -          " + phases.size() + " 問中");
+            indicator.setTitle(ChatColor.GREEN.toString() + (currentPhase + 1) + " 問目( " + phases.size() + " )問中");
         }
     }
 }

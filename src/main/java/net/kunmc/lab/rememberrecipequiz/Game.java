@@ -4,6 +4,9 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -20,7 +23,7 @@ public class Game
     private int currentPhase;
 
     //=========ここからゲーム用変数
-    private final boolean isInPhase;
+    private final BossBar indicator;
     private final List<UUID> finishedPlayers;
 
     public Game()
@@ -32,7 +35,8 @@ public class Game
         this.currentPhase = -1;
 
         //初期化
-        this.isInPhase = false;
+        this.indicator = Bukkit.createBossBar("", BarColor.GREEN, BarStyle.SOLID);
+        this.indicator.setVisible(false);
         this.finishedPlayers = new ArrayList<>();
     }
 
@@ -75,6 +79,7 @@ public class Game
         broadcastPlayer(ChatColor.RED + "ゲームが終了しました！");
         this.game.cancel();
         this.start = false;
+        this.indicator.setVisible(false);
     }
 
     public List<UUID> getPlayers()
@@ -85,15 +90,15 @@ public class Game
     public void addPlayer(Player player)
     {
         this.players.add(player.getUniqueId());
+        this.indicator.addPlayer(player);
         player.sendMessage(ChatColor.GREEN + "レシピクイズに参加しました！\n開始をお待ち下さい。");
     }
-
-    //===================================ここから下ゲッター・セッター
 
     public void removePlayer(Player player)
     {
         this.players.remove(player.getUniqueId());
         this.finishedPlayers.remove(player.getUniqueId());
+        this.indicator.removePlayer(player);
         player.sendMessage(ChatColor.RED + "レシピクイズから退出しました。");
 
     }
@@ -272,6 +277,8 @@ public class Game
             this.interval = phaseStaging.getTimeWait();
             this.itemName = Utils.getItemName(phaseStaging.targetMaterial);
             broadcastMessage(ChatColor.YELLOW + "お題：" + ChatColor.RED + itemName);
+
+            indicator.setProgress((currentPhase + 1) / (double) phases.size());
         }
     }
 

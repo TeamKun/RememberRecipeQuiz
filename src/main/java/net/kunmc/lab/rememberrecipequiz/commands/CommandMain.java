@@ -59,7 +59,7 @@ public class CommandMain implements CommandExecutor, TabCompleter
         switch (args.length)
         {
             case 1:
-                completes.addAll(Arrays.asList("help"));
+                completes.addAll(Arrays.asList("help", "add"));
                 break;
         }
 

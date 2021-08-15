@@ -373,6 +373,8 @@ public class Game
                 broadcastMessage(player.getName() + " はレシピを覚えていられなかった。");
             }
 
+            finishedPlayers.clear();
+
             String msg = "==========\n" +
                     "お題：" + itemName + "\n" +
                     "失格人数：" + count + "\n";

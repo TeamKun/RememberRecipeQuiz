@@ -407,6 +407,7 @@ public class Game
                 count++;
                 player.setHealth(0);
                 broadcastMessage(player.getName() + " はレシピを覚えていられなかった。");
+                eliminatedPlayers.add(player.getUniqueId());
             }
 
             finishedPlayers.clear();

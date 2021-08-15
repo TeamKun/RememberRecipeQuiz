@@ -10,7 +10,9 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.GameRule;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -74,6 +76,20 @@ public class Game
 
     public void actuallyStart()
     {
+        ArrayList<World> worlds = new ArrayList<>();
+        players.stream().parallel()
+                .forEach(uuid -> {
+                    Player player = Bukkit.getPlayer(uuid);
+                    if (player == null)
+                        return;
+                    if (!worlds.contains(player.getWorld()))
+                        worlds.add(player.getWorld());
+                });
+        worlds.forEach(world -> {
+            world.setGameRule(GameRule.KEEP_INVENTORY, true);
+            world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
+        });
+
         broadcastMessage(ChatColor.GREEN + "ゲームがスタートしました！");
         broadcastTitle(ChatColor.GREEN + "スタート！", "");
         this.indicator.setVisible(true);

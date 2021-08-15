@@ -13,7 +13,7 @@ public class CommandRandom
     public static void run(CommandSender sender, String[] args)
     {
 
-        if (Utils.invalidLengthMessage(sender, args, 0, 1))
+        if (Utils.invalidLengthMessage(sender, args, 0, 2))
             return;
 
         Integer count = 10;

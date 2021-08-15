@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Game
 {
@@ -351,17 +352,18 @@ public class Game
 
                 if (flags.contains(Flag.REVIVE_IN_NEXT_PHASE))
                 {
-                    eliminatedPlayers.stream().parallel()
-                            .forEach(uuid -> {
+                    eliminatedPlayers = eliminatedPlayers.stream().parallel()
+                            .filter(uuid -> {
                                 Player player = Bukkit.getPlayer(uuid);
                                 if (player == null)
-                                    return;
+                                    return false;
 
                                 if (player.isDead())
                                     player.spigot().respawn();
                                 player.setGameMode(GameMode.CREATIVE);
                                 player.sendMessage(ChatColor.GREEN + "復活モードが有効のため、復活しました！");
-                            });
+                                return false;
+                            }).collect(Collectors.toList());
                 }
 
                 sendInfo();

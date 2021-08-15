@@ -435,7 +435,7 @@ public class Game
                                         ChatColor.YELLOW + " 秒",
                                 0, 22, 0
                         );
-                        int ps = players.size();
+                        int ps = players.size() - eliminatedPlayers.size();
                         int fps = finishedPlayers.size();
                         player.sendActionBar(Component.text(ChatColor.GREEN.toString() + ps + " 人中 " + Utils.getCP(fps, ps) +
                                 ChatColor.GREEN + " 人がクリアしました！(" + ((int) (((double) fps / (double) ps) * 100)) + "%)"));

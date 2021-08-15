@@ -134,7 +134,7 @@ public class Game
 
     private void broadcastMessage(String message)
     {
-        Bukkit.broadcast(Component.text(message));
+        Bukkit.broadcast(Component.text(message), "req.play");
     }
 
     private void broadcastABMessage(String message)

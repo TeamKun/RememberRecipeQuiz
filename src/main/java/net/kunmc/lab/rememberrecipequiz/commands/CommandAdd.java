@@ -27,5 +27,6 @@ public class CommandAdd
         }
 
         RememberRecipeQuiz.game.addPhase(new Game.Phase(ag, st.getType()));
+        sender.sendMessage(ChatColor.GREEN + "S: お題を追加しました。");
     }
 }

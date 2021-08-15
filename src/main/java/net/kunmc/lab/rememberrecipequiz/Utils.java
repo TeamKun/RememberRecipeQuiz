@@ -1,5 +1,6 @@
 package net.kunmc.lab.rememberrecipequiz;
 
+import com.google.common.collect.Lists;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.translation.GlobalTranslator;
@@ -16,14 +17,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 public class Utils
 {
+    private static List<Recipe> recipes = null;
+
     public static String getItemName(Material mat)
     {
         return ((TextComponent)
@@ -136,4 +140,14 @@ public class Utils
         fw.setFireworkMeta(meta);
     }
 
+    public static Recipe getRandomRecipe()
+    {
+        if (recipes == null)
+            recipes = Lists.newArrayList(Bukkit.recipeIterator());
+
+        Random random = new Random();
+
+        return recipes.get(random.nextInt(recipes.size()));
+
+    }
 }

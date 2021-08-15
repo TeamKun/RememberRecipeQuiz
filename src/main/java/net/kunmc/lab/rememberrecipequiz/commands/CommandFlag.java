@@ -27,5 +27,8 @@ public class CommandFlag
             RememberRecipeQuiz.game.addFlag(flag);
         else
             RememberRecipeQuiz.game.removeFlag(flag);
+
+
+        sender.sendMessage(ChatColor.GREEN + "S: フラグ '" + flag + "' を " + args[1] + " にセットしました。");
     }
 }

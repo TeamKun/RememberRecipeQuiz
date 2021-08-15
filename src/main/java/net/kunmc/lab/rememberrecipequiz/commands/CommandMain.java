@@ -60,7 +60,7 @@ public class CommandMain implements CommandExecutor, TabCompleter
         switch (args.length)
         {
             case 1:
-                completes.addAll(Arrays.asList("help", "add", "flag"));
+                completes.addAll(Arrays.asList("help", "add", "flag", "random"));
                 break;
             case 2:
                 switch (args[0])

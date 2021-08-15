@@ -20,9 +20,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -196,6 +200,18 @@ public class Game
 
     public class GameLogic implements Listener
     {
+        @EventHandler
+        public void onInvClick(InventoryClickEvent e)
+        {
+            if (!start)
+                return;
+            if (e.getSlot() != 8)
+                return;
+            e.setCancelled(true);
+            e.getView().setCursor(null);
+            ((Player) e.getWhoClicked()).updateInventory();
+        }
+
         @EventHandler
         public void onRemove(PlayerQuitEvent e)
         {
@@ -473,7 +489,21 @@ public class Game
             phaseStaging = phases.get(i);
             this.interval = phaseStaging.getTimeWait();
             this.itemName = Utils.getItemName(phaseStaging.targetMaterial);
-            broadcastMessage(ChatColor.YELLOW + "お題：" + ChatColor.RED + itemName);
+
+            ItemStack example = new ItemStack(phaseStaging.targetMaterial);
+            ItemMeta meta = example.getItemMeta();
+            meta.displayName(Component.text("お題"));
+            example.setItemMeta(meta);
+
+            players.stream().parallel()
+                    .forEach(uuid -> {
+                        Player player = Bukkit.getPlayer(uuid);
+                        if (player == null)
+                            return;
+                        Bukkit.broadcast(Component.text(ChatColor.YELLOW + "お題：" + ChatColor.RED + itemName),
+                                "req.play");
+                        player.getInventory().setItem(8, example);
+                    });
 
             indicator.setProgress((currentPhase + 1) / (double) phases.size());
             indicator.setTitle(ChatColor.GREEN.toString() + (currentPhase + 1) + " 問目( " + phases.size() + " )問中");

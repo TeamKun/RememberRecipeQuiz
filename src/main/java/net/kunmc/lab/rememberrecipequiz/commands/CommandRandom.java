@@ -17,13 +17,13 @@ public class CommandRandom
             return;
 
         Integer count = 10;
-        if (args.length > 1)
+        if (args.length >= 1)
             if ((count = Utils.getAsIntegerOrNot(sender, args[0])) == null)
                 return;
 
 
         Integer thinking = 60;
-        if (args.length > 2)
+        if (args.length >= 2)
             if ((thinking = Utils.getAsIntegerOrNot(sender, args[1])) == null)
                 return;
 

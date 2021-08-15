@@ -80,7 +80,7 @@ public class Game
     {
         new BukkitRunnable()
         {
-            private int time = 5;
+            private int time = 6;
 
             @Override
             public void run()

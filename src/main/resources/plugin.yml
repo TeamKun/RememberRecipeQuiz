@@ -6,6 +6,7 @@ prefix: RememberRecipe
 authors: [Peyang]
 description: クラフトレシピ覚えてないとだめ。
 website: https://kunmc.net/
+depend: [ProtocolLib]
 
 commands:
   rememberrecipequiz:

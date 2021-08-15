@@ -54,6 +54,8 @@ public class CommandMain implements CommandExecutor, TabCompleter
             case "start":
                 CommandStart.run(sender, oxb);
                 break;
+            case "stop":
+                CommandStop.run(sender, oxb);
             default:
                 sender.sendMessage(ChatColor.RED + "E: 不明なコマンドです！");
                 sender.sendMessage(ChatColor.AQUA + "/req help コマンドでヘルプを閲覧することが出来ます。");
@@ -74,7 +76,7 @@ public class CommandMain implements CommandExecutor, TabCompleter
         switch (args.length)
         {
             case 1:
-                completes.addAll(Arrays.asList("help", "add", "flag", "random", "start"));
+                completes.addAll(Arrays.asList("help", "add", "flag", "random", "start", "stop"));
                 break;
             case 2:
                 switch (args[0])

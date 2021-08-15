@@ -21,6 +21,8 @@ public final class RememberRecipeQuiz extends JavaPlugin
                 .filter(player -> player.hasPermission("req.play"))
                 .forEach(game::addPlayer);
 
+        game = new Game();
+        game.registerLogics();
     }
 
     @Override

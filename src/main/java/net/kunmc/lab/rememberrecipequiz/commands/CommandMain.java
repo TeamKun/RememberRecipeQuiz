@@ -1,5 +1,6 @@
 package net.kunmc.lab.rememberrecipequiz.commands;
 
+import net.kunmc.lab.rememberrecipequiz.Game;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -59,8 +60,23 @@ public class CommandMain implements CommandExecutor, TabCompleter
         switch (args.length)
         {
             case 1:
-                completes.addAll(Arrays.asList("help", "add"));
+                completes.addAll(Arrays.asList("help", "add", "flag"));
                 break;
+            case 2:
+                switch (args[0])
+                {
+                    case "flag":
+                        completes.addAll(Arrays.asList(Game.Flag.names()));
+                        break;
+                }
+            case 3:
+                switch (args[0])
+                {
+                    case "flag":
+                        completes.add("on");
+                        completes.add("off");
+                        break;
+                }
         }
 
         ArrayList<String> asCopy = new ArrayList<>();

@@ -1,16 +1,27 @@
 package net.kunmc.lab.rememberrecipequiz;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,24 +31,36 @@ public class Game
     private final GameTimer game;
     private final List<Phase> phases;
     private boolean start;
+    private final ProtocolManager protocol;
+    private final GameLogic logic;
     private int currentPhase;
 
     //=========ここからゲーム用変数
     private final BossBar indicator;
     private final List<UUID> finishedPlayers;
+    private final List<UUID> eliminatedPlayers;
+    private Phase phaseStaging;
+    private final List<Flag> flags;
 
     public Game()
     {
         this.players = new ArrayList<>();
         this.phases = new ArrayList<>();
+        this.protocol = ProtocolLibrary.getProtocolManager();
         this.start = false;
         this.game = new GameTimer();
         this.currentPhase = -1;
+        this.logic = new GameLogic();
 
         //初期化
         this.indicator = Bukkit.createBossBar("", BarColor.GREEN, BarStyle.SOLID);
         this.indicator.setVisible(false);
         this.finishedPlayers = new ArrayList<>();
+        this.eliminatedPlayers = new ArrayList<>();
+        this.flags = new ArrayList<>();
+        this.phaseStaging = null;
+
+        this.protocol.addPacketListener(new CraftPacketListener());
     }
 
     public void actuallyStart()
@@ -144,6 +167,106 @@ public class Game
                 });
     }
 
+    public class GameLogic implements Listener
+    {
+        @EventHandler
+        public void onCraftComplete(CraftItemEvent e)
+        {
+            Player player = (Player) e.getWhoClicked();
+            if(e.getRecipe().getResult().getType() != phaseStaging.getTargetMaterial())
+                if (flags.contains(Flag.ONLY_ONCE_SUBMIT))
+                {
+                    player.setHealth(0.0);
+                    broadcastMessage(player.getName() + " はクラフトを間違えて失格になった。");
+                    eliminatedPlayers.add(player.getUniqueId());
+                    return;
+                }
+                else
+                    return;
+
+            Utils.playPingPongSound(player);
+            Utils.launchFireworks(player);
+            broadcastMessage(ChatColor.GREEN + player.getName() + " はお題のクラフトに成功しました！");
+            finishedPlayers.add(player.getUniqueId());
+        }
+    }
+
+    public class CraftPacketListener extends PacketAdapter
+    {
+        public CraftPacketListener()
+        {
+            super(RememberRecipeQuiz.getPlugin(), ListenerPriority.NORMAL, PacketType.Play.Server.AUTO_RECIPE);
+        }
+
+        @Override
+        public void onPacketSending(PacketEvent e)
+        {
+            if (e.getPacketType() != PacketType.Play.Server.AUTO_RECIPE)
+                return;
+            UUID id = e.getPlayer().getUniqueId();
+            if (players.contains(id) && !finishedPlayers.contains(id))
+            {
+                e.getPlayer().setHealth(0.0);
+                broadcastMessage(e.getPlayer().getName() + " はカンニングをしようとしたため失格になった。");
+                eliminatedPlayers.add(id);
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    public List<Flag> getFlags()
+    {
+        return flags;
+    }
+
+    public void addFlag(Flag f)
+    {
+        if (!flags.contains(f))
+            flags.add(f);
+    }
+
+    public void removeFlag(Flag f)
+    {
+        flags.remove(f);
+    }
+
+    public void registerLogics()
+    {
+        Bukkit.getPluginManager().registerEvents(logic, RememberRecipeQuiz.getPlugin());
+    }
+
+    public enum Flag
+    {
+        ONLY_ONCE_SUBMIT("once_craft"),
+        REVIVE_IN_NEXT_PHASE("revive_next_phase");
+        //ENDLESS("endless");
+
+        private final String id;
+
+        Flag(String id)
+        {
+            this.id = id;
+        }
+
+        public String getId()
+        {
+            return id;
+        }
+
+        public static String[] names()
+        {
+            return Arrays.stream(values()).map(Flag::getId).toArray(String[]::new);
+        }
+
+        public static Flag fromName(String name)
+        {
+            for (Flag value : values())
+                if (value.id.equals(name))
+                    return value;
+            return null;
+        }
+    }
+
     public static class Phase
     {
         private final int timeWait;
@@ -166,18 +289,16 @@ public class Game
         }
     }
 
+
     private class GameTimer extends BukkitRunnable
     {
 
         private int interval;
-        private Phase phaseStaging;
         private String itemName;
 
         public GameTimer()
         {
-
             this.interval = -1;
-            this.phaseStaging = null;
         }
 
         @Override
@@ -195,6 +316,21 @@ public class Game
 
                 initPhase(++currentPhase);
 
+                if (flags.contains(Flag.REVIVE_IN_NEXT_PHASE))
+                {
+                    eliminatedPlayers.stream().parallel()
+                            .forEach(uuid -> {
+                                Player player = Bukkit.getPlayer(uuid);
+                                if (player == null)
+                                    return;
+
+                                if (player.isDead())
+                                    player.spigot().respawn();
+                                player.setGameMode(GameMode.CREATIVE);
+                                player.sendMessage(ChatColor.GREEN + "復活モードが有効のため、復活しました！");
+                            });
+                }
+
                 sendInfo();
                 return;
             }
@@ -210,7 +346,7 @@ public class Game
 
         private void processPhaseEnd()
         {
-            int ps = players.size();
+            int ps = players.size() - eliminatedPlayers.size();
             int fps = finishedPlayers.size();
             broadcastTitle(
                     ChatColor.RED + "終了！",
@@ -221,7 +357,7 @@ public class Game
             int count = 0;
             for (UUID uuid : players)
             {
-                if (finishedPlayers.contains(uuid))
+                if (finishedPlayers.contains(uuid) || eliminatedPlayers.contains(uuid))
                     continue;
                 Player player = Bukkit.getPlayer(uuid);
                 if (player == null)
@@ -247,7 +383,7 @@ public class Game
             msg += ChatColor.WHITE + "==========";
             broadcastMessage(msg);
 
-            this.phaseStaging = null;
+            phaseStaging = null;
             this.interval = 7;
         }
 
@@ -273,7 +409,7 @@ public class Game
 
         private void initPhase(int i)
         {
-            this.phaseStaging = phases.get(i);
+            phaseStaging = phases.get(i);
             this.interval = phaseStaging.getTimeWait();
             this.itemName = Utils.getItemName(phaseStaging.targetMaterial);
             broadcastMessage(ChatColor.YELLOW + "お題：" + ChatColor.RED + itemName);
@@ -281,5 +417,4 @@ public class Game
             indicator.setProgress((currentPhase + 1) / (double) phases.size());
         }
     }
-
 }

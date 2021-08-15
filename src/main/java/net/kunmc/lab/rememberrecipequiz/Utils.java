@@ -5,13 +5,21 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 public class Utils
@@ -82,4 +90,50 @@ public class Utils
         ItemStack stack = new ItemStack(item);
         return Bukkit.getRecipesFor(stack).size() != 0;
     }
+
+    public static boolean validateArg(CommandSender sender, String value, String... need)
+    {
+        if (Arrays.asList(need).contains(value))
+            return false;
+
+        sender.sendMessage(ChatColor.RED + "E: 不正な引数です：" + value +
+                "。次のうちのどれかである必要があります：" + String.join(", ", need));
+        return true;
+    }
+
+    private static void playSound(Sound sound, Player p, float pitch)
+    {
+        p.playSound(p.getLocation(), sound, SoundCategory.PLAYERS, 1.0f, pitch);
+    }
+
+    public static void playPingPongSound(Player player)
+    {
+        playSound(Sound.BLOCK_NOTE_BLOCK_BIT, player, 1.42f);
+        playSound(Sound.BLOCK_NOTE_BLOCK_FLUTE, player, 1.06f);
+        playSound(Sound.BLOCK_NOTE_BLOCK_FLUTE, player, 0.7f);
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                playSound(Sound.BLOCK_NOTE_BLOCK_BIT, player, 1.06f);
+                playSound(Sound.BLOCK_NOTE_BLOCK_FLUTE, player, 0.8f);
+                playSound(Sound.BLOCK_NOTE_BLOCK_FLUTE, player, 0.53f);
+            }
+        }.runTaskLater(RememberRecipeQuiz.getPlugin(), 2L);
+    }
+
+    public static void launchFireworks(Player player)
+    {
+        Firework fw = player.getWorld().spawn(player.getLocation(), Firework.class);
+        FireworkMeta meta = fw.getFireworkMeta();
+        meta.addEffect(FireworkEffect.builder()
+                .withColor(Color.GREEN)
+                .with(FireworkEffect.Type.BALL)
+                .withFade(Color.WHITE)
+                .build());
+        meta.setPower(4);
+        fw.setFireworkMeta(meta);
+    }
+
 }

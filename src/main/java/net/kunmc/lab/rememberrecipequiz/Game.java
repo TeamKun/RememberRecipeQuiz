@@ -195,7 +195,14 @@ public class Game
         @EventHandler
         public void onRespawn(PlayerRespawnEvent e)
         {
-            e.getPlayer().setGameMode(GameMode.SPECTATOR);
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    e.getPlayer().setGameMode(GameMode.SPECTATOR);
+                }
+            }.runTaskLater(RememberRecipeQuiz.getPlugin(), 1L);
         }
 
 

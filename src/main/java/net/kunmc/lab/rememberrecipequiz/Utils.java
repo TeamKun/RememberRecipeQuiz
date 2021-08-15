@@ -1,9 +1,6 @@
 package net.kunmc.lab.rememberrecipequiz;
 
 import com.google.common.collect.Lists;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -21,7 +18,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
 public class Utils
@@ -30,8 +26,7 @@ public class Utils
 
     public static String getItemName(Material mat)
     {
-        return ((TextComponent)
-                GlobalTranslator.render(Component.translatable(mat.getTranslationKey()), Locale.JAPAN)).content();
+        return Translator.get(mat.getTranslationKey());
     }
 
     public static String getCP(int now, int max)
@@ -112,19 +107,15 @@ public class Utils
 
     public static void playPingPongSound(Player player)
     {
-        playSound(Sound.BLOCK_NOTE_BLOCK_BIT, player, 1.42f);
-        playSound(Sound.BLOCK_NOTE_BLOCK_FLUTE, player, 1.06f);
-        playSound(Sound.BLOCK_NOTE_BLOCK_FLUTE, player, 0.7f);
+        playSound(Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, player, 1.42f);
         new BukkitRunnable()
         {
             @Override
             public void run()
             {
-                playSound(Sound.BLOCK_NOTE_BLOCK_BIT, player, 1.06f);
-                playSound(Sound.BLOCK_NOTE_BLOCK_FLUTE, player, 0.8f);
-                playSound(Sound.BLOCK_NOTE_BLOCK_FLUTE, player, 0.53f);
+                playSound(Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, player, 1.06f);
             }
-        }.runTaskLater(RememberRecipeQuiz.getPlugin(), 2L);
+        }.runTaskLater(RememberRecipeQuiz.getPlugin(), 6L);
     }
 
     public static void launchFireworks(Player player)

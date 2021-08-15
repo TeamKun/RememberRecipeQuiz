@@ -311,7 +311,7 @@ public class Game
         {
             if (phaseStaging == null)
             {
-                if (--interval > 0)
+                if (--interval >= 0)
                 {
                     if (interval <= 5)
                         broadcastMessage(ChatColor.YELLOW + "次のお題まで... " +

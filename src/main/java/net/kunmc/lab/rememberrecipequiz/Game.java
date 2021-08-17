@@ -55,6 +55,7 @@ public class Game
     private List<UUID> eliminatedPlayers;
     private Phase phaseStaging;
     private final List<Flag> flags;
+    private int eliminatedThisPhase;
 
     public Game()
     {
@@ -73,6 +74,7 @@ public class Game
         this.eliminatedPlayers = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.phaseStaging = null;
+        this.eliminatedThisPhase = 0;
 
         this.protocol.addPacketListener(new CraftPacketListener());
     }
@@ -332,6 +334,7 @@ public class Game
                 e.getPlayer().setHealth(0.0);
                 broadcastMessage(e.getPlayer().getName() + " はカンニングをしようとしたため失格になった。");
                 eliminatedPlayers.add(id);
+                eliminatedThisPhase++;
                 e.setCancelled(true);
             }
         }
@@ -479,7 +482,6 @@ public class Game
                             ((int) (((double) fps / (double) ps) * 100)) + "%)"
             );
 
-            int count = 0;
             for (UUID uuid : players)
             {
                 if (finishedPlayers.contains(uuid) || eliminatedPlayers.contains(uuid))
@@ -487,7 +489,7 @@ public class Game
                 Player player = Bukkit.getPlayer(uuid);
                 if (player == null)
                     continue;
-                count++;
+                eliminatedThisPhase++;
                 player.setHealth(0);
                 broadcastMessage(player.getName() + " はレシピを覚えていられなかった。");
                 eliminatedPlayers.add(player.getUniqueId());
@@ -497,8 +499,9 @@ public class Game
 
             String msg = "==========\n" +
                     "お題：" + itemName + "\n" +
-                    "失格人数：" + count + "\n";
+                    "失格人数：" + eliminatedThisPhase + "\n";
 
+            eliminatedThisPhase = 0;
 
             if (currentPhase + 1 >= phases.size())
             {

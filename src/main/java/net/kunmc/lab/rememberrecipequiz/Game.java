@@ -431,6 +431,21 @@ public class Game
         }
 
         @Override
+        public synchronized void cancel()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                try
+                {
+                    if (super.isCancelled())
+                        break;
+                    super.cancel();
+                }
+                catch (Exception ignored) { }
+            }
+        }
+
+        @Override
         public void run()
         {
             if (phaseStaging == null)

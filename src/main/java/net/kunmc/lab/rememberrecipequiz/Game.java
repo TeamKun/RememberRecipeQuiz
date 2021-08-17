@@ -6,6 +6,8 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -340,6 +342,7 @@ public class Game
                 {
                     player.setHealth(0.0);
                     broadcastMessage(player.getName() + " はクラフトを間違えて失格になった。");
+                    player.playSound(Sound.sound(Key.key("minecraft:block.anvil.land"), Sound.Source.BLOCK, 1.0f, 1.0f));
                     eliminatedPlayers.add(player.getUniqueId());
                     return;
                 }
@@ -381,6 +384,7 @@ public class Game
             {
                 e.getPlayer().setHealth(0.0);
                 broadcastMessage(e.getPlayer().getName() + " はカンニングをしようとしたため失格になった。");
+                e.getPlayer().playSound(Sound.sound(Key.key("minecraft:block.anvil.land"), Sound.Source.BLOCK, 1.0f, 1.0f));
                 eliminatedPlayers.add(id);
                 eliminatedThisPhase++;
                 e.setCancelled(true);

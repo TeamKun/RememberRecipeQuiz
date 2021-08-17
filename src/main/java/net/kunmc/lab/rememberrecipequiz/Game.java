@@ -350,6 +350,13 @@ public class Game
             Utils.launchFireworks(player);
             broadcastMessage(ChatColor.GREEN + player.getName() + " はお題のクラフトに成功しました！");
             finishedPlayers.add(player.getUniqueId());
+
+            if (players.stream().parallel()
+                    .noneMatch(uuid -> !finishedPlayers.contains(uuid) && !eliminatedPlayers.contains(uuid)))
+            {
+                broadcastPlayer(ChatColor.GREEN + "全員がこのお題を処理しました！時間を進めています...");
+                game.skip();
+            }
         }
     }
 
@@ -525,6 +532,12 @@ public class Game
             }
 
             sendInfo();
+        }
+
+        public void skip()
+        {
+            if (this.interval > 3)
+                this.interval = 3;
         }
 
         private void processPhaseEnd()

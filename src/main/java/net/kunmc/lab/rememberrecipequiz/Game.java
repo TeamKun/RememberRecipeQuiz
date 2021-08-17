@@ -26,6 +26,7 @@ import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -214,6 +215,24 @@ public class Game
 
     public class GameLogic implements Listener
     {
+        @EventHandler
+        public void onGameModeChange(PlayerGameModeChangeEvent e)
+        {
+            Player p = e.getPlayer();
+
+            switch (e.getNewGameMode())
+            {
+                case CREATIVE:
+                    p.sendMessage(ChatColor.GREEN + "あなたのゲームモードが クリエイティブ モードに変更されたため状態を更新しています...");
+                    addPlayer(p);
+                    break;
+                case SPECTATOR:
+                    p.sendMessage(ChatColor.GREEN + "あなたのゲームモードが スペクテイター モードに変更されたため状態を更新しています...");
+                    removePlayer(p);
+                    break;
+            }
+        }
+
         @EventHandler
         public void onInvClick(InventoryClickEvent e)
         {

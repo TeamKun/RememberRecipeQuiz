@@ -11,7 +11,7 @@ public class CommandFlag
     public static void run(CommandSender sender, String[] args)
     {
 
-        if (Utils.invalidLengthMessage(sender, args, 1, 2) ||
+        if (Utils.invalidLengthMessage(sender, args, 2, 2) ||
                 Utils.validateArg(sender, args[1], "on", "off"))
             return;
 

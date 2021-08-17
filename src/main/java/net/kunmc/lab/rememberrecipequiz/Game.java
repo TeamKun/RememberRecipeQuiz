@@ -198,7 +198,8 @@ public class Game
 
     private void broadcastMessage(String message)
     {
-        Bukkit.broadcast(Component.text(message), "req.play");
+        Bukkit.getOnlinePlayers().stream().parallel()
+                .forEach(player -> player.sendMessage(message));
     }
 
     private void broadcastABMessage(String message)

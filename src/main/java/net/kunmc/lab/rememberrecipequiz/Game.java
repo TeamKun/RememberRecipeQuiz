@@ -172,10 +172,16 @@ public class Game
         return phases;
     }
 
+    public void addPhase(Phase phase, boolean silent)
+    {
+        if (!silent)
+            broadcastMessage(ChatColor.GREEN + "お題が追加されました！");
+        this.phases.add(phase);
+    }
+
     public void addPhase(Phase phase)
     {
-        broadcastMessage(ChatColor.GREEN + "お題が追加されました！");
-        this.phases.add(phase);
+        addPhase(phase, true);
     }
 
     private void broadcastMessage(String message)

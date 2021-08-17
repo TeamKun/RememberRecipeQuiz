@@ -6,8 +6,6 @@ import net.kunmc.lab.rememberrecipequiz.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import java.util.stream.IntStream;
-
 public class CommandRandom
 {
     public static void run(CommandSender sender, String[] args)
@@ -16,28 +14,29 @@ public class CommandRandom
         if (Utils.invalidLengthMessage(sender, args, 0, 2))
             return;
 
+        if (RememberRecipeQuiz.game.isStarted())
+        {
+            sender.sendMessage(ChatColor.RED + "E: ゲームが実行中はこの操作は出来ません。");
+            return;
+        }
+
         Integer count = 10;
         if (args.length >= 1)
             if ((count = Utils.getAsIntegerOrNot(sender, args[0])) == null)
                 return;
 
-
-        Integer thinking = 60;
+        Integer thinking = Game.Phase.timeWaitDefault;
         if (args.length >= 2)
             if ((thinking = Utils.getAsIntegerOrNot(sender, args[1])) == null)
                 return;
 
-        Integer finalThinking = thinking;
-        IntStream.range(0, count)
-                .parallel()
-                .forEach(value -> {
-                    RememberRecipeQuiz.game.addPhase(new Game.Phase(
-                            finalThinking,
-                            Utils.getRandomRecipe().getResult().getType()));
-                });
+        int total = 0;
 
+        for (int i = 0; i < count; i++)
+            total = RememberRecipeQuiz.game.addPhase(new Game.RandomPhase(thinking));
 
-        sender.sendMessage(ChatColor.GREEN + "S: ランダムなお題を " + count + " つ追加しました。");
+        sender.sendMessage(ChatColor.GREEN + "S: ランダムなお題を " + count + " つに設定しました。");
 
+        sender.sendMessage(ChatColor.BLUE + "I: 現在のお題数は " + total + " つです。");
     }
 }

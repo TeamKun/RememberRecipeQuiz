@@ -12,6 +12,12 @@ public class CommandAdd
 {
     public static void run(CommandSender sender, String[] args)
     {
+        if (RememberRecipeQuiz.game.isStarted())
+        {
+            sender.sendMessage(ChatColor.RED + "E: ゲームが実行中はこの操作は出来ません。");
+            return;
+        }
+
         Integer ag;
         ItemStack st;
         if (Utils.invalidLengthMessage(sender, args, 1, 1) ||

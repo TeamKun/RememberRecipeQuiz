@@ -36,6 +36,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -44,7 +45,7 @@ public class Game
 {
     private final List<UUID> players;
     private GameTimer game;
-    private final List<Phase> phases;
+    private List<Phase> phases;
     private boolean start;
     private final ProtocolManager protocol;
     private final GameLogic logic;
@@ -172,16 +173,23 @@ public class Game
         return phases;
     }
 
-    public void addPhase(Phase phase, boolean silent)
+    public int addPhase(Phase phase, boolean silent)
     {
         if (!silent)
             broadcastMessage(ChatColor.GREEN + "お題が追加されました！");
         this.phases.add(phase);
+        return this.phases.size();
     }
 
-    public void addPhase(Phase phase)
+    public int addPhase(Phase phase)
     {
-        addPhase(phase, true);
+        return addPhase(phase, true);
+    }
+
+    public void clearRandomPhases()
+    {
+        this.phases = this.phases.stream()
+                .filter(phase -> !(phase instanceof RandomPhase)).collect(Collectors.toList());
     }
 
     private void broadcastMessage(String message)
@@ -427,6 +435,8 @@ public class Game
         private final int timeWait;
         private final Material targetMaterial;
 
+        public static int timeWaitDefault;
+
         public Phase(int timeWait, Material targetMaterial)
         {
             this.timeWait = timeWait;
@@ -444,6 +454,18 @@ public class Game
         }
     }
 
+    public static class RandomPhase extends Phase
+    {
+        public RandomPhase(int timeWait)
+        {
+            super(timeWait, Utils.getRandomRecipe().getResult().getType());
+        }
+    }
+
+    public void randomizePhases()
+    {
+        Collections.shuffle(this.phases);
+    }
 
     private class GameTimer extends BukkitRunnable
     {

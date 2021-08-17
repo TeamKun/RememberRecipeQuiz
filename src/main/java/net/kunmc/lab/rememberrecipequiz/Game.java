@@ -88,8 +88,7 @@ public class Game
     public void actuallyStart()
     {
         ArrayList<World> worlds = new ArrayList<>();
-        players.stream().parallel()
-                .forEach(uuid -> {
+        players.forEach(uuid -> {
                     Player player = Bukkit.getPlayer(uuid);
                     if (player == null)
                         return;

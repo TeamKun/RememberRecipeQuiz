@@ -551,8 +551,7 @@ public class Game
                         Player player = Bukkit.getPlayer(uuid);
                         if (player == null)
                             return;
-                        Bukkit.broadcast(Component.text(ChatColor.YELLOW + "お題：" + ChatColor.RED + itemName),
-                                "req.play");
+                        player.sendMessage(Component.text(ChatColor.YELLOW + "お題：" + ChatColor.RED + itemName));
 
                         if (!flags.contains(Flag.NO_EXAMPLE))
                             player.getInventory().setItem(8, example);

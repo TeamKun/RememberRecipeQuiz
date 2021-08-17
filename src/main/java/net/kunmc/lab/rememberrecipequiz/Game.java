@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class Game
 {
     private final List<UUID> players;
-    private final GameTimer game;
+    private GameTimer game;
     private final List<Phase> phases;
     private boolean start;
     private final ProtocolManager protocol;
@@ -63,7 +63,6 @@ public class Game
         this.phases = new ArrayList<>();
         this.protocol = ProtocolLibrary.getProtocolManager();
         this.start = false;
-        this.game = new GameTimer();
         this.currentPhase = -1;
         this.logic = new GameLogic();
 
@@ -104,6 +103,7 @@ public class Game
         broadcastTitle(ChatColor.GREEN + "スタート！", "");
         this.indicator.setVisible(true);
         this.start = true;
+        this.game = new GameTimer();
         this.game.runTaskTimer(RememberRecipeQuiz.getPlugin(), 0L, 20L);
     }
 
@@ -137,6 +137,7 @@ public class Game
     {
         broadcastPlayer(ChatColor.RED + "ゲームが終了しました！");
         this.game.cancel();
+        this.game = null;
         this.start = false;
         this.indicator.setVisible(false);
     }
@@ -428,21 +429,6 @@ public class Game
         public GameTimer()
         {
             this.interval = -1;
-        }
-
-        @Override
-        public synchronized void cancel()
-        {
-            for (int i = 0; i < 5; i++)
-            {
-                try
-                {
-                    if (super.isCancelled())
-                        break;
-                    super.cancel();
-                }
-                catch (Exception ignored) { }
-            }
         }
 
         @Override

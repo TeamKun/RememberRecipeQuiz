@@ -448,7 +448,7 @@ public class Game
 
                 if (flags.contains(Flag.REVIVE_IN_NEXT_PHASE))
                 {
-                    eliminatedPlayers = eliminatedPlayers.stream().parallel()
+                    eliminatedPlayers = eliminatedPlayers.stream()
                             .filter(uuid -> {
                                 Player player = Bukkit.getPlayer(uuid);
                                 if (player == null)

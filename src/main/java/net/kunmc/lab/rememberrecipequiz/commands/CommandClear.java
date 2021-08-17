@@ -6,7 +6,7 @@ import net.kunmc.lab.rememberrecipequiz.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-public class CommandThingTime
+public class CommandClear
 {
     public static void run(CommandSender sender, String[] args)
     {
@@ -16,17 +16,8 @@ public class CommandThingTime
             return;
         }
 
-        if (args.length == 0)
-        {
-            sender.sendMessage(ChatColor.GREEN + "現在の値は " + Game.Phase.timeWaitDefault + " 秒です。");
-        }
+        RememberRecipeQuiz.game.clearPhase();
 
-        Integer ag;
-        if (Utils.invalidLengthMessage(sender, args, 1, 1) ||
-                (ag = Utils.getAsIntegerOrNot(sender, args[0])) == null)
-            return;
-
-        Game.Phase.timeWaitDefault = ag;
-        sender.sendMessage(ChatColor.GREEN + "S: シンキングタイムを変更しました。");
+        sender.sendMessage(ChatColor.GREEN + "S: お題をクリアしました。");
     }
 }

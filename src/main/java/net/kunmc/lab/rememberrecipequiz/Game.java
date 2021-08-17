@@ -185,6 +185,11 @@ public class Game
         return addPhase(phase, true);
     }
 
+    public void clearPhase()
+    {
+        this.phases.clear();
+    }
+
     public void clearRandomPhases()
     {
         this.phases = this.phases.stream()

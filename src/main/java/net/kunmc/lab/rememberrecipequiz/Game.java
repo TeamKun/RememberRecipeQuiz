@@ -60,7 +60,7 @@ public class Game
     private Phase phaseStaging;
     private final List<Flag> flags;
     private int eliminatedThisPhase;
-    private List<UUID> gameModeChangeTransaction;
+    private final List<UUID> gameModeChangeTransaction;
 
     public Game()
     {
@@ -107,6 +107,8 @@ public class Game
         broadcastMessage(ChatColor.GREEN + "ゲームがスタートしました！");
         broadcastTitle(ChatColor.GREEN + "スタート！", "");
         this.indicator.setVisible(true);
+        this.currentPhase = -1;
+        this.phaseStaging = null;
         this.start = true;
         this.game = new GameTimer();
         this.game.runTaskTimer(RememberRecipeQuiz.getPlugin(), 0L, 20L);

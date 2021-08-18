@@ -35,6 +35,11 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +50,9 @@ import java.util.stream.Collectors;
 
 public class Game
 {
+    private static Scoreboard mainScoreBoard;
+    private static Objective successes;
+
     private final List<UUID> players;
     private GameTimer game;
     private List<Phase> phases;
@@ -61,6 +69,11 @@ public class Game
     private final List<Flag> flags;
     private int eliminatedThisPhase;
     private final List<UUID> gameModeChangeTransaction;
+
+    static {
+        mainScoreBoard = Bukkit.getServer().getScoreboardManager().getMainScoreboard();
+        initScore();
+    }
 
     public Game()
     {
@@ -82,6 +95,13 @@ public class Game
         this.gameModeChangeTransaction = new ArrayList<>();
 
         this.protocol.addPacketListener(new CraftPacketListener());
+    }
+
+    private static void initScore()
+    {
+
+        if ((successes = mainScoreBoard.getObjective("r_quiz")) == null)
+            successes = mainScoreBoard.registerNewObjective("r_quiz", "dummy", Component.text("お題正解数"));
     }
 
     public boolean isStarted()
@@ -106,6 +126,7 @@ public class Game
 
         broadcastMessage(ChatColor.GREEN + "ゲームがスタートしました！");
         broadcastTitle(ChatColor.GREEN + "スタート！", "");
+        successes.setDisplaySlot(DisplaySlot.SIDEBAR);
         this.indicator.setVisible(true);
         this.currentPhase = -1;
         this.phaseStaging = null;
@@ -146,6 +167,9 @@ public class Game
         this.game.cancel();
         this.game = null;
         this.start = false;
+        if (successes != null)
+            successes.unregister();
+        initScore();
         this.indicator.setVisible(false);
     }
 
@@ -363,6 +387,10 @@ public class Game
 
             Utils.playPingPongSound(player);
             Utils.launchFireworks(player);
+
+            Score score = successes.getScore(player.getName());
+            score.setScore(score.getScore() + 1);
+
             broadcastMessage(ChatColor.GREEN + player.getName() + " はお題のクラフトに成功しました！");
             finishedPlayers.add(player.getUniqueId());
 

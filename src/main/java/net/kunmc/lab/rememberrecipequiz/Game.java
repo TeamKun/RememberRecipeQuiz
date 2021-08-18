@@ -461,7 +461,7 @@ public class Game
         private final int timeWait;
         private final Material targetMaterial;
 
-        public static int timeWaitDefault;
+        public static int timeWaitDefault = 60;
 
         public Phase(int timeWait, Material targetMaterial)
         {

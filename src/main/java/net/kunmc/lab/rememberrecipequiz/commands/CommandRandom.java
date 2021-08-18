@@ -32,6 +32,9 @@ public class CommandRandom
 
         int total = 0;
 
+
+        RememberRecipeQuiz.game.clearRandomPhases();
+
         for (int i = 0; i < count; i++)
             total = RememberRecipeQuiz.game.addPhase(new Game.RandomPhase(thinking));
 

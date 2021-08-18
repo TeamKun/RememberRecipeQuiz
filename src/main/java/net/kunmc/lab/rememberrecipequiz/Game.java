@@ -394,6 +394,7 @@ public class Game
             UUID id = e.getPlayer().getUniqueId();
             if (players.contains(id) && !finishedPlayers.contains(id))
             {
+                gameModeChangeTransaction.add(id);
                 e.getPlayer().setHealth(0.0);
                 broadcastMessage(e.getPlayer().getName() + " はカンニングをしようとしたため失格になった。");
                 e.getPlayer().playSound(Sound.sound(Key.key("minecraft:block.anvil.land"), Sound.Source.BLOCK, 1.0f, 1.0f));

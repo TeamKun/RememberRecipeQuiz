@@ -60,6 +60,7 @@ public class Game
     private Phase phaseStaging;
     private final List<Flag> flags;
     private int eliminatedThisPhase;
+    private List<UUID> gameModeChangeTransaction;
 
     public Game()
     {
@@ -78,6 +79,7 @@ public class Game
         this.flags = new ArrayList<>();
         this.phaseStaging = null;
         this.eliminatedThisPhase = 0;
+        this.gameModeChangeTransaction = new ArrayList<>();
 
         this.protocol.addPacketListener(new CraftPacketListener());
     }
@@ -155,6 +157,7 @@ public class Game
         this.players.add(player.getUniqueId());
         this.indicator.addPlayer(player);
         player.sendMessage(ChatColor.GREEN + "レシピクイズに参加しました！\n開始をお待ち下さい。");
+        gameModeChangeTransaction.add(player.getUniqueId());
         player.setGameMode(GameMode.CREATIVE);
     }
 
@@ -165,6 +168,7 @@ public class Game
         this.eliminatedPlayers.remove(player.getUniqueId());
         this.indicator.removePlayer(player);
         player.sendMessage(ChatColor.RED + "レシピクイズから退出しました。");
+        gameModeChangeTransaction.add(player.getUniqueId());
         player.setGameMode(GameMode.SPECTATOR);
 
     }
@@ -240,6 +244,11 @@ public class Game
         public void onGameModeChange(PlayerGameModeChangeEvent e)
         {
             Player p = e.getPlayer();
+            if (gameModeChangeTransaction.contains(p.getUniqueId()))
+            {
+                gameModeChangeTransaction.remove(p.getUniqueId());
+                return;
+            }
 
             switch (e.getNewGameMode())
             {
@@ -340,6 +349,7 @@ public class Game
             if(type != phaseStaging.getTargetMaterial())
                 if (flags.contains(Flag.ONLY_ONCE_SUBMIT))
                 {
+                    gameModeChangeTransaction.add(player.getUniqueId());
                     player.setHealth(0.0);
                     broadcastMessage(player.getName() + " はクラフトを間違えて失格になった。");
                     player.playSound(Sound.sound(Key.key("minecraft:block.anvil.land"), Sound.Source.BLOCK, 1.0f, 1.0f));
@@ -562,7 +572,8 @@ public class Game
                 if (player == null)
                     continue;
                 eliminatedThisPhase++;
-                player.setHealth(0);
+                gameModeChangeTransaction.add(player.getUniqueId());
+                player.setHealth(0.0);
                 broadcastMessage(player.getName() + " はレシピを覚えていられなかった。");
                 eliminatedPlayers.add(player.getUniqueId());
             }

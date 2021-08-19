@@ -464,6 +464,7 @@ public class Game
             switch (e.getNewGameMode())
             {
                 case CREATIVE:
+                    eliminatedPlayers.remove(p.getUniqueId());
                     if (players.contains(p.getUniqueId()))
                         return;
                     p.sendMessage(ChatColor.GREEN + "あなたのゲームモードが クリエイティブ モードに変更されたため状態を更新しています...");

@@ -19,7 +19,9 @@ public class Translator
         try (InputStreamReader reader = new InputStreamReader(RememberRecipeQuiz.class.getResourceAsStream(
                 "/ja_JP.json"), StandardCharsets.UTF_8))
         {
-            config = new Gson().fromJson(reader, new TypeToken<LinkedHashMap<String, String>>(){}.getType());
+            config = new Gson().fromJson(reader, new TypeToken<LinkedHashMap<String, String>>()
+            {
+            }.getType());
         }
         catch (Exception e)
         {

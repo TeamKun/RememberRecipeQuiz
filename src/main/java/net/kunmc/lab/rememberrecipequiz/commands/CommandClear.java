@@ -1,8 +1,6 @@
 package net.kunmc.lab.rememberrecipequiz.commands;
 
-import net.kunmc.lab.rememberrecipequiz.Game;
 import net.kunmc.lab.rememberrecipequiz.RememberRecipeQuiz;
-import net.kunmc.lab.rememberrecipequiz.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 

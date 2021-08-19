@@ -27,7 +27,6 @@ import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -40,7 +39,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,31 +49,31 @@ import java.util.stream.Collectors;
 
 public class Game
 {
-    public boolean isStarting;
-    private static Scoreboard mainScoreBoard;
+    private static final Scoreboard mainScoreBoard;
     private static Objective successes;
 
-    private final List<UUID> players;
-    private GameTimer game;
-    private List<Phase> phases;
-    private boolean start;
-    private final ProtocolManager protocol;
-    private final GameLogic logic;
-    private int currentPhase;
-
-    //=========ここからゲーム用変数
-    private final BossBar indicator;
-    private final List<UUID> finishedPlayers;
-    private List<UUID> eliminatedPlayers;
-    private Phase phaseStaging;
-    private final List<Flag> flags;
-    private int eliminatedThisPhase;
-    private final List<UUID> gameModeChangeTransaction;
-
-    static {
+    static
+    {
         mainScoreBoard = Bukkit.getServer().getScoreboardManager().getMainScoreboard();
         initScore();
     }
+
+    private final List<UUID> players;
+    private final ProtocolManager protocol;
+    private final GameLogic logic;
+    //=========ここからゲーム用変数
+    private final BossBar indicator;
+    private final List<UUID> finishedPlayers;
+    private final List<Flag> flags;
+    private final List<UUID> gameModeChangeTransaction;
+    public boolean isStarting;
+    private GameTimer game;
+    private List<Phase> phases;
+    private boolean start;
+    private int currentPhase;
+    private List<UUID> eliminatedPlayers;
+    private Phase phaseStaging;
+    private int eliminatedThisPhase;
 
     public Game()
     {
@@ -116,12 +114,12 @@ public class Game
     {
         ArrayList<World> worlds = new ArrayList<>();
         players.forEach(uuid -> {
-                    Player player = Bukkit.getPlayer(uuid);
-                    if (player == null)
-                        return;
-                    if (!worlds.contains(player.getWorld()))
-                        worlds.add(player.getWorld());
-                });
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null)
+                return;
+            if (!worlds.contains(player.getWorld()))
+                worlds.add(player.getWorld());
+        });
         worlds.forEach(world -> {
             world.setGameRule(GameRule.KEEP_INVENTORY, true);
             world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false);
@@ -286,6 +284,111 @@ public class Game
         }
     }
 
+    public List<Flag> getFlags()
+    {
+        return flags;
+    }
+
+    public void addFlag(Flag f)
+    {
+        if (!flags.contains(f))
+            flags.add(f);
+    }
+
+    public void removeFlag(Flag f)
+    {
+        flags.remove(f);
+    }
+
+    public void registerLogics()
+    {
+        Bukkit.getPluginManager().registerEvents(logic, RememberRecipeQuiz.getPlugin());
+    }
+
+    public void randomizePhases()
+    {
+        Collections.shuffle(this.phases);
+    }
+
+    public enum Flag
+    {
+        ONLY_ONCE_SUBMIT("once_craft"),
+        REVIVE_IN_NEXT_PHASE("revive_next_phase"),
+        NO_EXAMPLE("no_example");
+        //ENDLESS("endless");
+
+        private final String id;
+
+        Flag(String id)
+        {
+            this.id = id;
+        }
+
+        public static String[] names()
+        {
+            return Arrays.stream(values()).map(Flag::getId).toArray(String[]::new);
+        }
+
+        public static Flag fromName(String name)
+        {
+            for (Flag value : values())
+                if (value.id.equals(name))
+                    return value;
+            return null;
+        }
+
+        public String getId()
+        {
+            return id;
+        }
+    }
+
+    public static class Phase
+    {
+        public static int timeWaitDefault = 60;
+        private final Material targetMaterial;
+        private int timeWait;
+
+        public Phase(Material targetMaterial)
+        {
+            this(timeWaitDefault, targetMaterial);
+        }
+
+        public Phase(int timeWait, Material targetMaterial)
+        {
+            this.timeWait = timeWait;
+            this.targetMaterial = targetMaterial;
+        }
+
+        public int getTimeWait()
+        {
+            return timeWait;
+        }
+
+        public void setTimeWait(int timeWait)
+        {
+            this.timeWait = timeWait;
+        }
+
+        public Material getTargetMaterial()
+        {
+            return targetMaterial;
+        }
+    }
+
+    public static class RandomPhase extends Phase
+    {
+        public RandomPhase()
+        {
+            super(Utils.getRandomRecipe().getResult().getType());
+        }
+
+        public RandomPhase(int timeWait)
+        {
+            super(timeWait, Utils.getRandomRecipe().getResult().getType());
+        }
+    }
+
     public class GameLogic implements Listener
     {
         @EventHandler
@@ -355,7 +458,6 @@ public class Game
             }.runTaskLater(RememberRecipeQuiz.getPlugin(), 1L);
         }
 
-
         @EventHandler
         public void onCraftComplete(CraftItemEvent e)
         {
@@ -375,7 +477,8 @@ public class Game
         }
 
         @EventHandler
-        public void onFurnaceSmelt(FurnaceSmeltEvent e) {
+        public void onFurnaceSmelt(FurnaceSmeltEvent e)
+        {
 
             Furnace furnace = (Furnace) e.getBlock().getState();
             if (furnace.getCookTime() < 2)
@@ -400,7 +503,7 @@ public class Game
             if (finishedPlayers.contains(player.getUniqueId()))
                 return;
 
-            if(type != phaseStaging.getTargetMaterial())
+            if (type != phaseStaging.getTargetMaterial())
                 if (flags.contains(Flag.ONLY_ONCE_SUBMIT))
                 {
                     gameModeChangeTransaction.add(player.getUniqueId());
@@ -454,113 +557,6 @@ public class Game
                 e.setCancelled(true);
             }
         }
-    }
-
-    public List<Flag> getFlags()
-    {
-        return flags;
-    }
-
-    public void addFlag(Flag f)
-    {
-        if (!flags.contains(f))
-            flags.add(f);
-    }
-
-    public void removeFlag(Flag f)
-    {
-        flags.remove(f);
-    }
-
-    public void registerLogics()
-    {
-        Bukkit.getPluginManager().registerEvents(logic, RememberRecipeQuiz.getPlugin());
-    }
-
-    public enum Flag
-    {
-        ONLY_ONCE_SUBMIT("once_craft"),
-        REVIVE_IN_NEXT_PHASE("revive_next_phase"),
-        NO_EXAMPLE("no_example");
-        //ENDLESS("endless");
-
-        private final String id;
-
-        Flag(String id)
-        {
-            this.id = id;
-        }
-
-        public String getId()
-        {
-            return id;
-        }
-
-        public static String[] names()
-        {
-            return Arrays.stream(values()).map(Flag::getId).toArray(String[]::new);
-        }
-
-        public static Flag fromName(String name)
-        {
-            for (Flag value : values())
-                if (value.id.equals(name))
-                    return value;
-            return null;
-        }
-    }
-
-    public static class Phase
-    {
-        private int timeWait;
-        private final Material targetMaterial;
-
-        public static int timeWaitDefault = 60;
-
-
-        public Phase(Material targetMaterial)
-        {
-            this(timeWaitDefault, targetMaterial);
-        }
-
-        public Phase(int timeWait, Material targetMaterial)
-        {
-            this.timeWait = timeWait;
-            this.targetMaterial = targetMaterial;
-        }
-
-        public int getTimeWait()
-        {
-            return timeWait;
-        }
-
-        public void setTimeWait(int timeWait)
-        {
-            this.timeWait = timeWait;
-        }
-
-        public Material getTargetMaterial()
-        {
-            return targetMaterial;
-        }
-    }
-
-    public static class RandomPhase extends Phase
-    {
-        public RandomPhase()
-        {
-            super(Utils.getRandomRecipe().getResult().getType());
-        }
-
-        public RandomPhase(int timeWait)
-        {
-            super(timeWait, Utils.getRandomRecipe().getResult().getType());
-        }
-    }
-
-    public void randomizePhases()
-    {
-        Collections.shuffle(this.phases);
     }
 
     private class GameTimer extends BukkitRunnable

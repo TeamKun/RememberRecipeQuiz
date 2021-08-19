@@ -56,7 +56,7 @@ public class Utils
         {
             return Integer.parseInt(value);
         }
-        catch(NumberFormatException ignored)
+        catch (NumberFormatException ignored)
         {
             sender.sendMessage(ChatColor.RED + "E: 引数が不正です。/req helpでヘルプを閲覧してください。");
             return null;

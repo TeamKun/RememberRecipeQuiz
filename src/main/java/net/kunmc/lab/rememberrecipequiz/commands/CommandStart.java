@@ -1,6 +1,5 @@
 package net.kunmc.lab.rememberrecipequiz.commands;
 
-import net.kunmc.lab.rememberrecipequiz.Game;
 import net.kunmc.lab.rememberrecipequiz.RememberRecipeQuiz;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -24,7 +23,7 @@ public class CommandStart
 
         if (RememberRecipeQuiz.game.isStarting)
         {
-            sender.sendMessage(ChatColor.RED+ "E: ゲームを開始し中です。");
+            sender.sendMessage(ChatColor.RED + "E: ゲームを開始し中です。");
             return;
         }
         RememberRecipeQuiz.game.startWithCountdown();

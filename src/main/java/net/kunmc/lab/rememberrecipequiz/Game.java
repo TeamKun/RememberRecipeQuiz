@@ -475,6 +475,11 @@ public class Game
                 @Override
                 public void run()
                 {
+                    if (gameModeChangeTransaction.contains(e.getPlayer().getUniqueId()))
+                    {
+                        gameModeChangeTransaction.remove(e.getPlayer().getUniqueId());
+                        return;
+                    }
                     e.getPlayer().setGameMode(GameMode.SPECTATOR);
                 }
             }.runTaskLater(RememberRecipeQuiz.getPlugin(), 1L);
@@ -616,7 +621,11 @@ public class Game
                                     return false;
 
                                 if (player.isDead())
+                                {
+                                    gameModeChangeTransaction.add(uuid);
+
                                     player.spigot().respawn();
+                                }
                                 gameModeChangeTransaction.add(uuid);
                                 player.setGameMode(GameMode.CREATIVE);
                                 player.sendMessage(ChatColor.GREEN + "復活モードが有効のため、復活しました！");

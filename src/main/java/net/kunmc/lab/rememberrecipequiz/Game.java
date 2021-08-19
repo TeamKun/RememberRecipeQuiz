@@ -196,8 +196,11 @@ public class Game
         this.players.add(player.getUniqueId());
         this.indicator.addPlayer(player);
         player.sendMessage(ChatColor.GREEN + "レシピクイズに参加しました！\n開始をお待ち下さい。");
-        gameModeChangeTransaction.add(player.getUniqueId());
-        player.setGameMode(GameMode.CREATIVE);
+        if (player.getGameMode() != GameMode.CREATIVE)
+        {
+            gameModeChangeTransaction.add(player.getUniqueId());
+            player.setGameMode(GameMode.CREATIVE);
+        }
     }
 
     public void removePlayer(Player player)
@@ -206,9 +209,21 @@ public class Game
         this.finishedPlayers.remove(player.getUniqueId());
         this.eliminatedPlayers.remove(player.getUniqueId());
         this.indicator.removePlayer(player);
+        if (this.players.contains(player.getUniqueId()))
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    players.remove(player.getUniqueId());
+                }
+            }.runTaskLater(RememberRecipeQuiz.getPlugin(), 1L);
         player.sendMessage(ChatColor.RED + "レシピクイズから退出しました。");
-        gameModeChangeTransaction.add(player.getUniqueId());
-        player.setGameMode(GameMode.SPECTATOR);
+        if (player.getGameMode() != GameMode.SPECTATOR)
+        {
+            gameModeChangeTransaction.add(player.getUniqueId());
+            player.setGameMode(GameMode.SPECTATOR);
+        }
 
     }
 
@@ -478,12 +493,11 @@ public class Game
                 @Override
                 public void run()
                 {
-                    if (gameModeChangeTransaction.contains(e.getPlayer().getUniqueId()))
+                    if (e.getPlayer().getGameMode() != GameMode.SPECTATOR)
                     {
-                        gameModeChangeTransaction.remove(e.getPlayer().getUniqueId());
-                        return;
+                        gameModeChangeTransaction.add(e.getPlayer().getUniqueId());
+                        e.getPlayer().setGameMode(GameMode.SPECTATOR);
                     }
-                    e.getPlayer().setGameMode(GameMode.SPECTATOR);
                 }
             }.runTaskLater(RememberRecipeQuiz.getPlugin(), 1L);
         }
@@ -536,7 +550,6 @@ public class Game
             if (type != phaseStaging.getTargetMaterial())
                 if (flags.contains(Flag.ONLY_ONCE_SUBMIT))
                 {
-                    gameModeChangeTransaction.add(player.getUniqueId());
                     player.setHealth(0.0);
                     broadcastMessage(player.getName() + " はクラフトを間違えて失格になった。");
                     player.playSound(Sound.sound(Key.key("minecraft:block.anvil.land"), Sound.Source.BLOCK, 1.0f, 1.0f));
@@ -578,7 +591,6 @@ public class Game
             UUID id = e.getPlayer().getUniqueId();
             if (players.contains(id) && !finishedPlayers.contains(id))
             {
-                gameModeChangeTransaction.add(id);
                 e.getPlayer().setHealth(0.0);
                 broadcastMessage(e.getPlayer().getName() + " はカンニングをしようとしたため失格になった。");
                 e.getPlayer().playSound(Sound.sound(Key.key("minecraft:block.anvil.land"), Sound.Source.BLOCK, 1.0f, 1.0f));
@@ -624,13 +636,13 @@ public class Game
                                     return false;
 
                                 if (player.isDead())
-                                {
-                                    gameModeChangeTransaction.add(uuid);
-
                                     player.spigot().respawn();
+
+                                if (player.getGameMode() != GameMode.CREATIVE)
+                                {
+                                    gameModeChangeTransaction.add(player.getUniqueId());
+                                    player.setGameMode(GameMode.CREATIVE);
                                 }
-                                gameModeChangeTransaction.add(uuid);
-                                player.setGameMode(GameMode.CREATIVE);
                                 player.sendMessage(ChatColor.GREEN + "復活モードが有効のため、復活しました！");
                                 return false;
                             }).collect(Collectors.toList());
@@ -679,7 +691,6 @@ public class Game
                 if (player == null)
                     continue;
                 eliminatedThisPhase++;
-                gameModeChangeTransaction.add(player.getUniqueId());
                 player.setHealth(0.0);
                 broadcastMessage(player.getName() + " はレシピを覚えていられなかった。");
                 eliminatedPlayers.add(player.getUniqueId());

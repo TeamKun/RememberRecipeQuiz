@@ -176,11 +176,8 @@ public class Game
         if (this.game != null)
             this.game.cancel();
         this.game = null;
-        this.players.forEach(uuid -> {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null)
-                return;
-            gameModeChangeTransaction.add(uuid);
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            gameModeChangeTransaction.add(player.getUniqueId());
             player.setGameMode(GameMode.CREATIVE);
         });
         this.start = false;

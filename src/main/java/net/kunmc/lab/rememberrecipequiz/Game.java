@@ -168,9 +168,7 @@ public class Game
             this.game.cancel();
         this.game = null;
         this.start = false;
-        if (successes != null)
-            successes.unregister();
-        initScore();
+
         this.indicator.setVisible(false);
     }
 

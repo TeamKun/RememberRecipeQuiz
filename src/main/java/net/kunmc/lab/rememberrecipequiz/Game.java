@@ -33,6 +33,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -298,6 +299,9 @@ public class Game
         public void onInvClick(InventoryClickEvent e)
         {
             if (!start)
+                return;
+
+            if (!(e.getInventory() instanceof PlayerInventory))
                 return;
 
             if (flags.contains(Flag.NO_EXAMPLE))

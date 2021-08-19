@@ -6,7 +6,7 @@ import net.kunmc.lab.rememberrecipequiz.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-public class CommandThingTime
+public class CommandThinkTime
 {
     public static void run(CommandSender sender, String[] args)
     {

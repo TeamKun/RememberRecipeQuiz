@@ -62,6 +62,7 @@ public class CommandMain implements CommandExecutor, TabCompleter
                 break;
             case "clear":
                 CommandClear.run(sender, oxb);
+                break;
             default:
                 sender.sendMessage(ChatColor.RED + "E: 不明なコマンドです！");
                 sender.sendMessage(ChatColor.AQUA + "/req help コマンドでヘルプを閲覧することが出来ます。");

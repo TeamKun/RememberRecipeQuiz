@@ -57,8 +57,8 @@ public class CommandMain implements CommandExecutor, TabCompleter
             case "stop":
                 CommandStop.run(sender, oxb);
                 break;
-            case "thingtime":
-                CommandThingTime.run(sender, oxb);
+            case "thinktime":
+                CommandThinkTime.run(sender, oxb);
                 break;
             case "clear":
                 CommandClear.run(sender, oxb);
@@ -82,7 +82,7 @@ public class CommandMain implements CommandExecutor, TabCompleter
         switch (args.length)
         {
             case 1:
-                completes.addAll(Arrays.asList("help", "add", "flag", "random", "start", "stop", "clear", "thingtime"));
+                completes.addAll(Arrays.asList("help", "add", "flag", "random", "start", "stop", "clear", "thinktime"));
                 break;
             case 2:
                 switch (args[0])

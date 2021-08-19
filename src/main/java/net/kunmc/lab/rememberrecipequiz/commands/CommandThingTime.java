@@ -19,6 +19,7 @@ public class CommandThingTime
         if (args.length == 0)
         {
             sender.sendMessage(ChatColor.GREEN + "現在の値は " + Game.Phase.timeWaitDefault + " 秒です。");
+            return;
         }
 
         Integer ag;

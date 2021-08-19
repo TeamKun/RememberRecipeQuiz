@@ -27,6 +27,11 @@ public class CommandThingTime
             return;
 
         Game.Phase.timeWaitDefault = ag;
+
+        RememberRecipeQuiz.game.getPhases().forEach(phase -> {
+            phase.setTimeWait(ag);
+        });
+
         sender.sendMessage(ChatColor.GREEN + "S: シンキングタイムを変更しました。");
     }
 }

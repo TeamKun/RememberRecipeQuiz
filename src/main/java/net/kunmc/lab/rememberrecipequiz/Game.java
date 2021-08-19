@@ -164,7 +164,8 @@ public class Game
     public void actuallyStop()
     {
         broadcastPlayer(ChatColor.RED + "ゲームが終了しました！");
-        this.game.cancel();
+        if (this.game != null)
+            this.game.cancel();
         this.game = null;
         this.start = false;
         if (successes != null)
@@ -489,7 +490,7 @@ public class Game
 
     public static class Phase
     {
-        private final int timeWait;
+        private int timeWait;
         private final Material targetMaterial;
 
         public static int timeWaitDefault = 60;
@@ -503,6 +504,11 @@ public class Game
         public int getTimeWait()
         {
             return timeWait;
+        }
+
+        public void setTimeWait(int timeWait)
+        {
+            this.timeWait = timeWait;
         }
 
         public Material getTargetMaterial()

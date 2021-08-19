@@ -21,7 +21,7 @@ public final class RememberRecipeQuiz extends JavaPlugin
 
         game = new Game();
         game.registerLogics();
-        Bukkit.getOnlinePlayers().stream().parallel()
+        Bukkit.getOnlinePlayers()
                 .forEach(game::addPlayer);
 
         getCommand("req").setExecutor(new CommandMain());

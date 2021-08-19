@@ -270,6 +270,16 @@ public class Game
                 });
     }
 
+    private void doSkip()
+    {
+        if (players.stream().parallel()
+                .noneMatch(uuid -> !finishedPlayers.contains(uuid) && !eliminatedPlayers.contains(uuid)))
+        {
+            broadcastPlayer(ChatColor.GREEN + "全員がこのお題を処理しました！時間を進めています...");
+            game.skip();
+        }
+    }
+
     public class GameLogic implements Listener
     {
         @EventHandler
@@ -392,6 +402,7 @@ public class Game
                     broadcastMessage(player.getName() + " はクラフトを間違えて失格になった。");
                     player.playSound(Sound.sound(Key.key("minecraft:block.anvil.land"), Sound.Source.BLOCK, 1.0f, 1.0f));
                     eliminatedPlayers.add(player.getUniqueId());
+                    doSkip();
                     return;
                 }
                 else
@@ -405,13 +416,7 @@ public class Game
 
             broadcastMessage(ChatColor.GREEN + player.getName() + " はお題のクラフトに成功しました！");
             finishedPlayers.add(player.getUniqueId());
-
-            if (players.stream().parallel()
-                    .noneMatch(uuid -> !finishedPlayers.contains(uuid) && !eliminatedPlayers.contains(uuid)))
-            {
-                broadcastPlayer(ChatColor.GREEN + "全員がこのお題を処理しました！時間を進めています...");
-                game.skip();
-            }
+            doSkip();
         }
     }
 

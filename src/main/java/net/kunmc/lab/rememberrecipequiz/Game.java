@@ -112,6 +112,9 @@ public class Game
 
     public void actuallyStart()
     {
+        if (successes != null)
+            successes.unregister();
+        initScore();
         ArrayList<World> worlds = new ArrayList<>();
         players.forEach(uuid -> {
             Player player = Bukkit.getPlayer(uuid);

@@ -25,18 +25,13 @@ public class CommandRandom
             if ((count = Utils.getAsIntegerOrNot(sender, args[0])) == null)
                 return;
 
-        Integer thinking = Game.Phase.timeWaitDefault;
-        if (args.length >= 2)
-            if ((thinking = Utils.getAsIntegerOrNot(sender, args[1])) == null)
-                return;
-
         int total = 0;
 
 
         RememberRecipeQuiz.game.clearRandomPhases();
 
         for (int i = 0; i < count; i++)
-            total = RememberRecipeQuiz.game.addPhase(new Game.RandomPhase(thinking));
+            total = RememberRecipeQuiz.game.addPhase(new Game.RandomPhase());
 
         sender.sendMessage(ChatColor.GREEN + "S: ランダムなお題を " + count + " つに設定しました。");
 

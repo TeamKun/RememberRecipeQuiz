@@ -506,6 +506,12 @@ public class Game
 
         public static int timeWaitDefault = 60;
 
+
+        public Phase(Material targetMaterial)
+        {
+            this(timeWaitDefault, targetMaterial);
+        }
+
         public Phase(int timeWait, Material targetMaterial)
         {
             this.timeWait = timeWait;
@@ -530,6 +536,11 @@ public class Game
 
     public static class RandomPhase extends Phase
     {
+        public RandomPhase()
+        {
+            super(Utils.getRandomRecipe().getResult().getType());
+        }
+
         public RandomPhase(int timeWait)
         {
             super(timeWait, Utils.getRandomRecipe().getResult().getType());

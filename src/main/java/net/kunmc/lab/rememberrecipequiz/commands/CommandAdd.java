@@ -18,10 +18,8 @@ public class CommandAdd
             return;
         }
 
-        Integer ag;
         ItemStack st;
-        if (Utils.invalidLengthMessage(sender, args, 1, 1) ||
-                (ag = Utils.getAsIntegerOrNot(sender, args[0])) == null ||
+        if (Utils.invalidLengthMessage(sender, args, 0, 0) ||
                 Utils.checkSenderPlayer(sender) ||
                 (st = Utils.getHandItemOrNot((Player) sender)) == null)
             return;
@@ -32,7 +30,7 @@ public class CommandAdd
             return;
         }
 
-        RememberRecipeQuiz.game.addPhase(new Game.Phase(ag, st.getType()), false);
+        RememberRecipeQuiz.game.addPhase(new Game.Phase(st.getType()), false);
         sender.sendMessage(ChatColor.GREEN + "S: お題を追加しました。");
     }
 }

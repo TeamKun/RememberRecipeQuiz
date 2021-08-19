@@ -131,6 +131,8 @@ public class Game
         this.indicator.setVisible(true);
         this.currentPhase = -1;
         this.phaseStaging = null;
+        this.finishedPlayers.clear();
+        this.eliminatedPlayers.clear();
         this.start = true;
         this.game = new GameTimer();
         this.game.runTaskTimer(RememberRecipeQuiz.getPlugin(), 0L, 20L);
@@ -593,6 +595,7 @@ public class Game
 
                                 if (player.isDead())
                                     player.spigot().respawn();
+                                gameModeChangeTransaction.add(uuid);
                                 player.setGameMode(GameMode.CREATIVE);
                                 player.sendMessage(ChatColor.GREEN + "復活モードが有効のため、復活しました！");
                                 return false;

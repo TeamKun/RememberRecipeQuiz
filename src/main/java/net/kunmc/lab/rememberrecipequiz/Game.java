@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
 
 public class Game
 {
+    public boolean isStarting;
     private static Scoreboard mainScoreBoard;
     private static Objective successes;
 
@@ -84,6 +85,7 @@ public class Game
         this.start = false;
         this.currentPhase = -1;
         this.logic = new GameLogic();
+        this.isStarting = false;
 
         //初期化
         this.indicator = Bukkit.createBossBar("", BarColor.GREEN, BarStyle.SOLID);
@@ -140,6 +142,7 @@ public class Game
 
     public void startWithCountdown()
     {
+        isStarting = true;
         new BukkitRunnable()
         {
             private int time = 6;
@@ -150,6 +153,7 @@ public class Game
                 if (--time <= 0)
                 {
                     this.cancel();
+                    isStarting = false;
                     actuallyStart();
                     return;
                 }

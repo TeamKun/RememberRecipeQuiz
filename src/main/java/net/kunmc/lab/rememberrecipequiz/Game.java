@@ -6,6 +6,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -432,6 +433,25 @@ public class Game
     public class GameLogic implements Listener
     {
         @EventHandler
+        public void onRPC(PlayerRecipeBookClickEvent e)
+        {
+
+            if (!start)
+                return;
+
+            UUID id = e.getPlayer().getUniqueId();
+            if (players.contains(id) && !finishedPlayers.contains(id))
+            {
+                e.getPlayer().setHealth(0.0);
+                broadcastMessage(e.getPlayer().getName() + " はカンニングをしようとしたため失格になった。");
+                e.getPlayer().playSound(Sound.sound(Key.key("minecraft:block.anvil.land"), Sound.Source.BLOCK, 1.0f, 1.0f));
+                eliminatedPlayers.add(id);
+                eliminatedThisPhase++;
+                e.setCancelled(true);
+            }
+        }
+
+        @EventHandler
         public void onGameModeChange(PlayerGameModeChangeEvent e)
         {
             Player p = e.getPlayer();
@@ -444,10 +464,14 @@ public class Game
             switch (e.getNewGameMode())
             {
                 case CREATIVE:
+                    if (players.contains(p.getUniqueId()))
+                        return;
                     p.sendMessage(ChatColor.GREEN + "あなたのゲームモードが クリエイティブ モードに変更されたため状態を更新しています...");
                     addPlayer(p);
                     break;
                 case SPECTATOR:
+                    if (!players.contains(p.getUniqueId()))
+                        return;
                     p.sendMessage(ChatColor.GREEN + "あなたのゲームモードが スペクテイター モードに変更されたため状態を更新しています...");
                     removePlayer(p);
                     break;

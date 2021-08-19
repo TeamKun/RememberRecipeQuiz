@@ -381,6 +381,9 @@ public class Game
             if (phaseStaging == null)
                 return;
 
+            if (finishedPlayers.contains(player.getUniqueId()))
+                return;
+
             if(type != phaseStaging.getTargetMaterial())
                 if (flags.contains(Flag.ONLY_ONCE_SUBMIT))
                 {

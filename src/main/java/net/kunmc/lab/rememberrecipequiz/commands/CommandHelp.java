@@ -24,5 +24,7 @@ public class CommandHelp
                 " <on|off>\n    " +
                 "フラグをセットします。");
         sender.sendMessage(ChatColor.GREEN + "  /req clear \n    お題をすべてクリアします。");
+        sender.sendMessage(ChatColor.GREEN + "  /req phasetime [シンキング秒数:int] \n    " +
+                "今進行しているお題のシンキングタイムを変更します。");
     }
 }

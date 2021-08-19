@@ -349,6 +349,10 @@ public class Game
         private final Material targetMaterial;
         private int timeWait;
 
+        private boolean isPlaying;
+
+
+
         public Phase(Material targetMaterial)
         {
             this(timeWaitDefault, targetMaterial);
@@ -358,6 +362,7 @@ public class Game
         {
             this.timeWait = timeWait;
             this.targetMaterial = targetMaterial;
+            this.isPlaying = false;
         }
 
         public int getTimeWait()
@@ -374,6 +379,23 @@ public class Game
         {
             return targetMaterial;
         }
+
+        public boolean isPlaying()
+        {
+            return isPlaying;
+        }
+
+        public void setPlaying(boolean playing)
+        {
+            isPlaying = playing;
+        }
+    }
+
+    public void phaseTimeChange(int i)
+    {
+        if (this.game == null)
+            return;
+        this.game.changeInterval(i);
     }
 
     public static class RandomPhase extends Phase
@@ -562,7 +584,7 @@ public class Game
     private class GameTimer extends BukkitRunnable
     {
 
-        private int interval;
+        private volatile int interval;
         private String itemName;
 
         public GameTimer()
@@ -575,7 +597,7 @@ public class Game
         {
             if (phaseStaging == null)
             {
-                if (--interval >= 0)
+                if (changeInterval(this.interval - 1) >= 0)
                 {
                     if (interval <= 5)
                         broadcastMessage(ChatColor.YELLOW + "次のお題まで... " +
@@ -606,13 +628,19 @@ public class Game
                 return;
             }
 
-            if (--interval <= 0)
+            if (changeInterval(this.interval - 1) <= 0)
             {
                 processPhaseEnd();
                 return;
             }
 
             sendInfo();
+        }
+
+        public synchronized int changeInterval(int i)
+        {
+            this.interval = i;
+            return i;
         }
 
         public void skip()
@@ -663,7 +691,7 @@ public class Game
             msg += ChatColor.GREEN + "次のお題がまもなく出題されます！\n";
             msg += ChatColor.WHITE + "==========";
             broadcastMessage(msg);
-
+            phaseStaging.setPlaying(false);
             phaseStaging = null;
             this.interval = 7;
         }
@@ -691,6 +719,7 @@ public class Game
         private void initPhase(int i)
         {
             phaseStaging = phases.get(i);
+            phaseStaging.setPlaying(true);
             this.interval = phaseStaging.getTimeWait();
             this.itemName = Utils.getItemName(phaseStaging.targetMaterial);
 

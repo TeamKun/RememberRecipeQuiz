@@ -427,25 +427,33 @@ public class Game
         }
     }
 
+    public boolean onCheat(Player p)
+    {
+        if (!start)
+            return false;
+
+        UUID id = p.getUniqueId();
+        if (players.contains(id) && !finishedPlayers.contains(id))
+        {
+            p.setHealth(0.0);
+            broadcastMessage(p.getName() + " はカンニングをしようとしたため失格になった。");
+            p.playSound(Sound.sound(Key.key("minecraft:block.anvil.land"), Sound.Source.BLOCK, 1.0f, 1.0f));
+            eliminatedPlayers.add(id);
+            eliminatedThisPhase++;
+            doSkip();
+            return true;
+        }
+
+        return false;
+    }
+
     public class GameLogic implements Listener
     {
-        @EventHandler
+
+        @EventHandler(ignoreCancelled = true)
         public void onRPC(PlayerRecipeBookClickEvent e)
         {
-
-            if (!start)
-                return;
-
-            UUID id = e.getPlayer().getUniqueId();
-            if (players.contains(id) && !finishedPlayers.contains(id))
-            {
-                e.getPlayer().setHealth(0.0);
-                broadcastMessage(e.getPlayer().getName() + " はカンニングをしようとしたため失格になった。");
-                e.getPlayer().playSound(Sound.sound(Key.key("minecraft:block.anvil.land"), Sound.Source.BLOCK, 1.0f, 1.0f));
-                eliminatedPlayers.add(id);
-                eliminatedThisPhase++;
-                e.setCancelled(true);
-            }
+            e.setCancelled(onCheat(e.getPlayer()));
         }
 
         @EventHandler
@@ -607,19 +615,7 @@ public class Game
             if (e.getPacketType() != PacketType.Play.Server.AUTO_RECIPE)
                 return;
 
-            if (!start)
-                return;
-
-            UUID id = e.getPlayer().getUniqueId();
-            if (players.contains(id) && !finishedPlayers.contains(id))
-            {
-                e.getPlayer().setHealth(0.0);
-                broadcastMessage(e.getPlayer().getName() + " はカンニングをしようとしたため失格になった。");
-                e.getPlayer().playSound(Sound.sound(Key.key("minecraft:block.anvil.land"), Sound.Source.BLOCK, 1.0f, 1.0f));
-                eliminatedPlayers.add(id);
-                eliminatedThisPhase++;
-                e.setCancelled(true);
-            }
+            e.setCancelled(onCheat(e.getPlayer()));
         }
     }
 

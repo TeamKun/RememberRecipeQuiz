@@ -518,6 +518,12 @@ public class Game
         @EventHandler
         public void onRespawn(PlayerRespawnEvent e)
         {
+            if (gameModeChangeTransaction.contains(e.getPlayer().getUniqueId()))
+            {
+                gameModeChangeTransaction.remove(e.getPlayer().getUniqueId());
+                return;
+            }
+
             new BukkitRunnable()
             {
                 @Override
@@ -653,6 +659,7 @@ public class Game
                                 if (player == null)
                                     return false;
 
+                                gameModeChangeTransaction.add(player.getUniqueId());
                                 if (player.isDead())
                                     player.spigot().respawn();
 

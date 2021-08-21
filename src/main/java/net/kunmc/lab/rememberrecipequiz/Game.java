@@ -702,7 +702,8 @@ public class Game
             broadcastTitle(
                     ChatColor.RED + "終了！",
                     Utils.getCP(fps, ps) + ChatColor.GREEN + " 人がクリアしました！(" +
-                            ((int) (((double) fps / (double) ps) * 100)) + "%)"
+                            ((int) (((double) fps / (double) ps) * 100)) + "%)",
+                    5, 100, 5
             );
 
             for (UUID uuid : players)

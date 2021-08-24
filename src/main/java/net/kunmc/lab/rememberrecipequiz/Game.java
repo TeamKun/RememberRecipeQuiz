@@ -194,7 +194,7 @@ public class Game
         this.players.add(player.getUniqueId());
         this.indicator.addPlayer(player);
         player.sendMessage(ChatColor.GREEN + "レシピクイズに参加しました！\n開始をお待ち下さい。");
-        if (player.getGameMode() != GameMode.CREATIVE)
+        if (!this.eliminatedPlayers.contains(player.getUniqueId()) && player.getGameMode() != GameMode.CREATIVE)
         {
             gameModeChangeTransaction.add(player.getUniqueId());
             player.setGameMode(GameMode.CREATIVE);
@@ -204,8 +204,8 @@ public class Game
     public void removePlayer(Player player)
     {
         this.players.remove(player.getUniqueId());
-        this.finishedPlayers.remove(player.getUniqueId());
-        this.eliminatedPlayers.remove(player.getUniqueId());
+        //this.finishedPlayers.remove(player.getUniqueId());
+        //this.eliminatedPlayers.remove(player.getUniqueId());
         this.indicator.removePlayer(player);
         if (this.players.contains(player.getUniqueId()))
             new BukkitRunnable()
@@ -659,9 +659,11 @@ public class Game
                                 if (player == null)
                                     return false;
 
-                                gameModeChangeTransaction.add(player.getUniqueId());
                                 if (player.isDead())
+                                {
+                                    gameModeChangeTransaction.add(player.getUniqueId());
                                     player.spigot().respawn();
+                                }
 
                                 if (player.getGameMode() != GameMode.CREATIVE)
                                 {

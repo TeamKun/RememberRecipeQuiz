@@ -6,7 +6,9 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import com.destroystokyo.paper.event.entity.WitchReadyPotionEvent;
 import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
+import io.papermc.paper.event.player.PlayerStonecutterRecipeSelectEvent;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -23,11 +25,14 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.PrepareSmithingEvent;
+import org.bukkit.event.inventory.SmithItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -449,6 +454,29 @@ public class Game
 
     public class GameLogic implements Listener
     {
+        @EventHandler
+        public void onBrew(BrewEvent e)
+        {
+            e.getContents().getViewers().forEach(humanEntity -> {
+                Arrays.stream(e.getContents().getContents())
+                        .forEach(itemStack -> {
+                            if (itemStack == null)
+                                return;
+                            onComplete((Player) humanEntity, itemStack.getType());
+                        });
+            });
+
+        }
+
+        @EventHandler
+        public void onSmith(SmithItemEvent e)
+        {
+            ItemStack resultStack = e.getInventory().getResult();
+            if (resultStack == null)
+                return;
+
+            onComplete((Player) e.getWhoClicked(), resultStack.getType());
+        }
 
         @EventHandler(ignoreCancelled = true)
         public void onRPC(PlayerRecipeBookClickEvent e)

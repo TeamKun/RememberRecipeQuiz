@@ -182,6 +182,8 @@ public class Game
             this.game.cancel();
         this.game = null;
         Bukkit.getOnlinePlayers().forEach(player -> {
+            if (player.getGameMode() == GameMode.CREATIVE)
+                return;
             gameModeChangeTransaction.add(player.getUniqueId());
             player.setGameMode(GameMode.CREATIVE);
         });
